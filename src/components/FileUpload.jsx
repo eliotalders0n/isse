@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { FiUpload } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import JSZip from 'jszip';
 
 const FileUpload = ({ onFileProcessed }) => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -18,14 +19,39 @@ const FileUpload = ({ onFileProcessed }) => {
   const fileInputRef = useRef(null);
   const toast = useToast();
 
+  const extractTextFromZip = async (file) => {
+    try {
+      const zip = new JSZip();
+      const zipContent = await zip.loadAsync(file);
+      
+      // Find the first .txt file in the zip
+      const txtFile = Object.keys(zipContent.files).find(filename => 
+        filename.endsWith('.txt') && !filename.startsWith('__MACOSX')
+      );
+
+      if (!txtFile) {
+        throw new Error('No .txt file found in the zip archive');
+      }
+
+      // Extract and read the text file
+      const textContent = await zipContent.files[txtFile].async('text');
+      return textContent;
+    } catch (error) {
+      throw new Error(`Failed to extract zip file: ${error.message}`);
+    }
+  };
+
   const handleFileSelect = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    if (!file.name.endsWith('.txt')) {
+    const isZip = file.name.endsWith('.zip');
+    const isTxt = file.name.endsWith('.txt');
+
+    if (!isZip && !isTxt) {
       toast({
         title: 'Invalid file type',
-        description: 'Please upload a .txt file from WhatsApp export',
+        description: 'Please upload a .txt or .zip file from WhatsApp export',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -38,40 +64,41 @@ const FileUpload = ({ onFileProcessed }) => {
     setProgress(20);
 
     try {
-      const reader = new FileReader();
+      let content;
 
-      reader.onload = async (e) => {
-        setProgress(50);
-        const content = e.target.result;
+      if (file.name.endsWith('.zip')) {
+        // Handle zip file
+        setProgress(30);
+        content = await extractTextFromZip(file);
+        setProgress(70);
+      } else {
+        // Handle regular txt file
+        const reader = new FileReader();
+        
+        content = await new Promise((resolve, reject) => {
+          reader.onload = (e) => {
+            setProgress(50);
+            resolve(e.target.result);
+          };
+          reader.onerror = () => reject(new Error('Failed to read file'));
+          reader.readAsText(file);
+        });
+      }
 
-        setTimeout(() => {
-          setProgress(100);
-          onFileProcessed(content);
+      setTimeout(() => {
+        setProgress(100);
+        onFileProcessed(content);
 
-          toast({
-            title: 'File processed successfully!',
-            description: 'Your chat insights are ready',
-            status: 'success',
-            duration: 3000,
-            isClosable: true,
-          });
-
-          setIsProcessing(false);
-        }, 500);
-      };
-
-      reader.onerror = () => {
         toast({
-          title: 'Error reading file',
-          description: 'Please try again',
-          status: 'error',
+          title: 'File processed successfully!',
+          description: 'Your chat insights are ready',
+          status: 'success',
           duration: 3000,
           isClosable: true,
         });
-        setIsProcessing(false);
-      };
 
-      reader.readAsText(file);
+        setIsProcessing(false);
+      }, 500);
     } catch (error) {
       toast({
         title: 'Processing error',
@@ -115,7 +142,7 @@ const FileUpload = ({ onFileProcessed }) => {
         type="file"
         ref={fileInputRef}
         onChange={handleFileSelect}
-        accept=".txt"
+        accept=".txt,.zip"
         style={{ display: 'none' }}
       />
 
@@ -181,7 +208,7 @@ const FileUpload = ({ onFileProcessed }) => {
               Choose Your Chat File
             </MotionButton>
             <Text fontSize={{ base: "xs", md: "sm" }} color="sand.500" mt={{ base: 2, md: 3 }}>
-              Need help? Export your WhatsApp chat without media as a .txt file
+              Need help? Export your WhatsApp chat without media as a .txt or .zip file
             </Text>
           </>
         )}
