@@ -99,11 +99,11 @@ const StatsCard = ({ chatData }) => {
         >
           <Text color="gray.700" fontSize="md" lineHeight="tall">
             <strong>Coach's note:</strong>{' '}
-            {analytics.avgMessagesPerDay > 50
+            {sentiment.coachNotes?.stats || (analytics.avgMessagesPerDay > 50
               ? "You two chat quite a lot! Strong connection indicator."
               : analytics.avgMessagesPerDay > 20
               ? "Regular and consistent communication shows healthy engagement."
-              : "Your conversations are thoughtful and intentional."}
+              : "Your conversations are thoughtful and intentional.")}
           </Text>
         </MotionBox>
       </VStack>

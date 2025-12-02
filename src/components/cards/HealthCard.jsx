@@ -16,8 +16,9 @@ const HealthCard = ({ chatData }) => {
       display="flex"
       flexDirection="column"
       boxShadow="2xl"
+      overflow="hidden"
     >
-      <VStack spacing={6} align="stretch" flex={1} justify="center">
+      <VStack spacing={6} align="stretch" flex={1} overflowY="auto" pr={2}>
         <MotionBox
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -54,8 +55,8 @@ const HealthCard = ({ chatData }) => {
               sentiment.communicationHealth === 'healthy'
                 ? 'green.600'
                 : sentiment.communicationHealth === 'moderate'
-                ? 'orange.600'
-                : 'red.600'
+                  ? 'orange.600'
+                  : 'red.600'
             }
             fontWeight="black"
             textTransform="uppercase"
@@ -119,27 +120,115 @@ const HealthCard = ({ chatData }) => {
           )}
         </VStack>
 
-        <MotionBox
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          bg="green.50"
-          p={4}
-          borderRadius="xl"
-          borderLeft="4px solid"
-          borderColor="green.500"
-        >
-          <HStack spacing={2} mb={2}>
-            <Box as={FiAward} color="green.600" size={20} />
-            <Text fontWeight="bold" color="gray.800">
-              Coach's note
+        {/* AI-Powered or Generic Coach's Note */}
+        {sentiment.aiPowered ? (
+          <VStack spacing={4} align="stretch">
+            {/* AI Overall Dynamic */}
+            {sentiment.aiOverallDynamic && (
+              <MotionBox
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                bg="purple.50"
+                p={4}
+                borderRadius="xl"
+                borderLeft="4px solid"
+                borderColor="purple.500"
+              >
+                <HStack spacing={2} mb={2}>
+                  <Box as={FiAward} color="purple.600" size={20} />
+                  <Text fontWeight="bold" color="gray.800">
+                    AI Relationship Analysis
+                  </Text>
+                  <Badge colorScheme="purple" fontSize="xs">AI</Badge>
+                </HStack>
+                <Text color="gray.700" fontSize="md" lineHeight="tall">
+                  {sentiment.aiOverallDynamic}
+                </Text>
+              </MotionBox>
+            )}
+
+            {/* AI Key Strengths */}
+            {sentiment.aiKeyStrengths && sentiment.aiKeyStrengths.length > 0 && (
+              <MotionBox
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                bg="green.50"
+                p={4}
+                borderRadius="xl"
+                borderLeft="4px solid"
+                borderColor="green.500"
+              >
+                <HStack spacing={2} mb={2}>
+                  <Box as={FiAward} color="green.600" size={20} />
+                  <Text fontWeight="bold" color="gray.800">
+                    Key Strengths
+                  </Text>
+                </HStack>
+                <VStack align="start" spacing={1}>
+                  {sentiment.aiKeyStrengths.map((strength, idx) => (
+                    <HStack key={idx} spacing={2}>
+                      <Text color="green.600">✓</Text>
+                      <Text color="gray.700" fontSize="sm">{strength}</Text>
+                    </HStack>
+                  ))}
+                </VStack>
+              </MotionBox>
+            )}
+
+            {/* AI Areas for Growth */}
+            {sentiment.aiAreasForGrowth && sentiment.aiAreasForGrowth.length > 0 && (
+              <MotionBox
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                bg="orange.50"
+                p={4}
+                borderRadius="xl"
+                borderLeft="4px solid"
+                borderColor="orange.500"
+              >
+                <HStack spacing={2} mb={2}>
+                  <Box as={FiTrendingUp} color="orange.600" size={20} />
+                  <Text fontWeight="bold" color="gray.800">
+                    Growth Opportunities
+                  </Text>
+                </HStack>
+                <VStack align="start" spacing={1}>
+                  {sentiment.aiAreasForGrowth.map((area, idx) => (
+                    <HStack key={idx} spacing={2}>
+                      <Text color="orange.600">→</Text>
+                      <Text color="gray.700" fontSize="sm">{area}</Text>
+                    </HStack>
+                  ))}
+                </VStack>
+              </MotionBox>
+            )}
+          </VStack>
+        ) : (
+          <MotionBox
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            bg="green.50"
+            p={4}
+            borderRadius="xl"
+            borderLeft="4px solid"
+            borderColor="green.500"
+          >
+            <HStack spacing={2} mb={2}>
+              <Box as={FiAward} color="green.600" size={20} />
+              <Text fontWeight="bold" color="gray.800">
+                Coach's note
+              </Text>
+            </HStack>
+            <Text color="gray.700" fontSize="md" lineHeight="tall">
+              Strong relationships thrive on consistent, meaningful communication. You're doing
+              great!
             </Text>
-          </HStack>
-          <Text color="gray.700" fontSize="md" lineHeight="tall">
-            Strong relationships thrive on consistent, meaningful communication. You're doing
-            great!
-          </Text>
-        </MotionBox>
+          </MotionBox>
+        )}
       </VStack>
     </Box>
   );

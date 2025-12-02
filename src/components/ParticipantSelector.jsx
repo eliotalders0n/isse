@@ -20,7 +20,7 @@ const ParticipantSelector = ({ participants, onSelectParticipant }) => {
   return (
     <Box
       minH="100vh"
-      bg="linear-gradient(180deg, #FFF5F0 0%, #FFEDD5 100%)"
+      bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
       display="flex"
       alignItems="center"
       justifyContent="center"
@@ -35,12 +35,12 @@ const ParticipantSelector = ({ participants, onSelectParticipant }) => {
             <VStack spacing={4} textAlign="center">
               <Heading
                 size={{ base: 'xl', md: '2xl' }}
-                color="warm.700"
+                color="white"
                 fontWeight="800"
               >
                 One More Thing...
               </Heading>
-              <Text fontSize={{ base: 'lg', md: 'xl' }} color="sand.600">
+              <Text fontSize={{ base: 'lg', md: 'xl' }} color="white">
                 Which one are you? This helps us personalize your insights.
               </Text>
             </VStack>
@@ -68,12 +68,12 @@ const ParticipantSelector = ({ participants, onSelectParticipant }) => {
                           <Text fontSize="xl" fontWeight="bold" color="sand.800">
                             {participant}
                           </Text>
-                          <Text fontSize="sm" color="sand.500">
+                          <Text fontSize="sm" color="warm.500">
                             This is me
                           </Text>
                         </VStack>
                       </HStack>
-                      <Box as={FiUser} size={24} color="warm.400" />
+                      <Box as={FiUser} size={24} color="purple.400" />
                     </HStack>
                   </CardBody>
                 </MotionCard>

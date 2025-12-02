@@ -43,14 +43,7 @@ const IntroCard = ({ chatData }) => {
 
         <HStack spacing={8} justify="center" flexWrap="wrap">
           {metadata.participants.map((participant, idx) => (
-            <MotionBox
-              key={participant}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 + idx * 0.2 }}
-            >
-              <ParticipantAvatar name={participant} size="xl" mood={overallMood} />
-            </MotionBox>
+            <ParticipantAvatar key={idx} name={participant} size="xl" mood={overallMood} />
           ))}
         </HStack>
 

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Babili Extraction Test</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        /* Styles to mimic Google Chat layout for detection */
+        .rogmqd { 
+            display: flex; 
+            flex-direction: column; 
+            margin-bottom: 10px;
+        }
+        div[jsname="bgckF"] { 
+            padding: 10px; 
+            background: #f1f1f1;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        /* Mock scrollable container */
+        #scrollable-container {
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 20px;
+            position: relative;
+        }
+        
+        /* Force scrollability */
+        .spacer { height: 600px; } 
+        
+        /* Right align for "You" */
+        .right-aligned {
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        .right-aligned div[jsname="bgckF"] {
+            background: #d1e3ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Babili Extraction Test</h1>
+    <div id="status">Status: Loading...</div>
+    
+    <!-- Mock Google Chat Structure -->
+    <div id="scrollable-container" jsname="scroller">
+        <div class="spacer"></div>
+        
+        <!-- Message 1: From Sandra -->
+        <div class="rogmqd">
+            <div aria-label="Message from Sandra Masiwa at Yesterday 21:23">
+                <div jsname="bgckF">I love you</div>
+            </div>
+        </div>
+
+        <!-- Message 2: From You -->
+        <div class="rogmqd right-aligned">
+            <div aria-label="You sent a message at Yesterday 21:24">
+                <div jsname="bgckF">I love you too!</div>
+            </div>
+        </div>
+
+        <!-- Message 3: From Sandra (no aria-label on parent, testing fallback) -->
+        <div class="rogmqd">
+            <div jsname="bgckF">Are we still on for dinner?</div>
+            <div class="timestamp">Today 10:00</div>
+        </div>
+        
+        <!-- Message 4: From You (styled) -->
+        <div class="rogmqd right-aligned">
+            <div jsname="bgckF">Yes, definitely.</div>
+        </div>
+    </div>
+
+    <script>
+        // Mock Chrome API
+        window.chrome = {
+            runtime: {
+                onMessage: {
+                    addListener: (callback) => {
+                        console.log('Listener registered');
+                        window.messageListener = callback;
+                    }
+                }
+            }
+        };
+    </script>
+    
+    <!-- Load the content script -->
+    <script src="../content.js"></script>
+    
+    <script>
+        // Run test
+        document.getElementById('status').textContent = 'Status: Script loaded, waiting...';
+        
+        setTimeout(() => {
+            if (window.messageListener) {
+                document.getElementById('status').textContent = 'Status: Extracting...';
+                
+                window.messageListener({action: 'extract_messages'}, {}, (response) => {
+                    console.log('Extraction Result:', response);
+                    
+                    const resultDiv = document.createElement('pre');
+                    resultDiv.id = 'result';
+                    resultDiv.style.background = '#333';
+                    resultDiv.style.color = '#fff';
+                    resultDiv.style.padding = '10px';
+                    resultDiv.textContent = JSON.stringify(response, null, 2);
+                    document.body.appendChild(resultDiv);
+                    
+                    document.getElementById('status').textContent = 'Status: Complete';
+                });
+            } else {
+                document.getElementById('status').textContent = 'Status: Error - Listener not registered';
+                console.error('Listener not registered');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Babili Chat Extractor</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Babili Chat Extractor</h1>
+    <p class="subtitle">Extract chats from WhatsApp, Google Chat, and more</p>
+
+    <div class="status" id="status">
+      Open a chat conversation and click Extract
+    </div>
+
+    <div class="controls">
+      <button id="extractBtn" class="btn-primary">Extract Chat</button>
+      <button id="exportBtn" class="btn-secondary" disabled>Export JSON</button>
+      <button id="uploadBtn" class="btn-upload" disabled>Upload to Babili</button>
+    </div>
+
+    <div class="upload-config">
+      <label for="uploadUrl">Upload URL</label>
+      <input id="uploadUrl" type="text" value="https://babili-isse.web.app/api/upload" />
+    </div>
+
+    <pre id="output" class="output"></pre>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

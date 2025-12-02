@@ -7,7 +7,7 @@ import FileUpload from './components/FileUpload';
 import ParticipantSelector from './components/ParticipantSelector';
 import SwipeableCardDashboard from './components/SwipeableCardDashboard';
 import bgImage from './assets/3746043.jpg';
-import { parseWhatsAppChat, getStatsPerSender, getMessagesPerDay } from './utils/whatsappParser';
+import { parseWhatsAppChat, parseJSONChat, parseGmailPDF, getStatsPerSender, getMessagesPerDay } from './utils/whatsappParser';
 import {
   calculateWordFrequency,
   calculateWordFrequencyPerSender,
@@ -25,6 +25,7 @@ import {
   detectConflictResolution,
   getAffectionLevel,
   detectToxicity,
+  generateAllCoachNotes,
 } from './services/sentimentAnalysis';
 import {
   calculateRelationshipLevel,
@@ -63,9 +64,19 @@ function App() {
     cleanupExpiredDuoSessions();
   }, []);
 
-  const handleFileProcessed = (fileContent) => {
+  const handleFileProcessed = async (fileContent, fileType = 'text') => {
     try {
-      const { messages, metadata } = parseWhatsAppChat(fileContent);
+      // Use appropriate parser based on file type
+      let parsedData;
+      if (fileType === 'json') {
+        parsedData = parseJSONChat(fileContent);
+      } else if (fileType === 'pdf') {
+        parsedData = parseGmailPDF(fileContent);
+      } else {
+        parsedData = parseWhatsAppChat(fileContent);
+      }
+
+      const { messages, metadata } = parsedData;
 
       if (messages.length === 0) {
         throw new Error('No messages found in the file');
@@ -80,9 +91,6 @@ function App() {
       const responseTimes = calculateResponseTimes(messages);
       const peakHours = detectPeakHours(messages);
       const engagementScore = calculateEngagementScore(messages, 'week');
-
-      const messagesWithSentiment = analyzeChatSentiment(messages);
-      const sentimentTimeline = getSentimentTimeline(messagesWithSentiment, 'day');
 
       const totalDays = Math.ceil(
         (messages[messages.length - 1].timestamp - messages[0].timestamp) / (1000 * 60 * 60 * 24)
@@ -108,7 +116,17 @@ function App() {
         avgMessagesPerDay,
       };
 
-      const sentiment = generateRelationshipSummary(messagesWithSentiment, stats);
+      console.log('📊 Step 1: Running keyword-based sentiment analysis (fast, no AI quota)...');
+      // First pass: Fast keyword-based sentiment analysis for all messages
+      // This analyzes ALL messages using keyword matching (no API calls, instant results)
+      const messagesWithSentiment = analyzeChatSentiment(messages, false);
+      const sentimentTimeline = getSentimentTimeline(messagesWithSentiment, 'day');
+
+      console.log('🤖 Step 2: Enhancing with AI conversation-level insights (1 API call)...');
+      // Second pass: AI-powered conversation insights (uses only 1 API call instead of 30+)
+      // Old approach: 30+ API calls to analyze individual messages = high quota usage
+      // New approach: 1 API call for conversation-level insights = 97% quota reduction
+      const sentiment = await generateRelationshipSummary(messagesWithSentiment, stats, true);
       sentiment.timeline = sentimentTimeline;
 
       // Calculate additional sentiment metrics
@@ -116,6 +134,32 @@ function App() {
       sentiment.conflictResolution = detectConflictResolution(messagesWithSentiment);
       sentiment.affectionLevel = getAffectionLevel(messagesWithSentiment);
       sentiment.toxicity = detectToxicity(messagesWithSentiment);
+
+      console.log('💬 Step 3: Generating AI-enhanced coach\'s notes for all cards (1 API call)...');
+      // Third pass: AI-powered coach's notes for all cards (1 API call for all cards)
+      const coachNotes = await generateAllCoachNotes({
+        balance: {
+          participants: metadata.participants,
+          messageDistribution: stats.senderStats
+        },
+        emotions: {
+          positivePercent: sentiment.positivePercent,
+          negativePercent: sentiment.negativePercent,
+          neutralPercent: sentiment.neutralPercent,
+          topEmotions: sentiment.topEmotions
+        },
+        stats: {
+          totalMessages: metadata.totalMessages,
+          totalDays: analytics.totalDays,
+          avgMessagesPerDay: analytics.avgMessagesPerDay,
+          overallSentiment: sentiment.overallSentiment
+        },
+        patterns: {
+          peakHours: analytics.peakHours?.slice(0, 3).map(h => typeof h === 'object' ? h.hour : h),
+          longestStreak: analytics.streaks?.[0]?.days || 0
+        }
+      });
+      sentiment.coachNotes = coachNotes;
 
       // Generate chat ID from participants
       const chatId = generateChatId(metadata.participants);
@@ -196,91 +240,91 @@ function App() {
     <Box
       minH="100vh"
       overflowX="hidden"
-      bg="linear-gradient(180deg, #FFF5F0 0%, #FFEDD5 100%)"
+      bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
     >
       <Box position="relative" zIndex={1}>
         <AnimatePresence mode="wait">
-        {!processedData ? (
-          <MotionBox
-            key="upload"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Container maxW="container.md" py={{ base: 8, md: 20 }} px={{ base: 4, md: 6 }}>
-              <VStack spacing={{ base: 8, md: 10 }} align="stretch">
-                <Box w="100%" display="flex" justifyContent="center">
-                  <Card bg="white" borderRadius="2xl" boxShadow="xl" w="100%" border="2px solid" borderColor="warm.200">
-                    <CardBody px={{ base: 6, md: 10 }} py={8} maxW="720px" mx="auto" textAlign="center">
-                      <MotionHeading
-                        size={{ base: "2xl", md: "3xl" }}
-                        mb={4}
-                        color="warm.600"
-                        fontWeight="800"
-                        initial={{ y: -20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                      >
-                        Isse
-                      </MotionHeading>
-                      <MotionText
-                        fontSize={{ base: "xl", md: "2xl" }}
-                        color="sand.700"
-                        mb={3}
-                        fontWeight="600"
-                        initial={{ y: -10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                      >
-                        Your Relationship Coach
-                      </MotionText>
-                      <MotionText
-                        fontSize={{ base: "md", md: "lg" }}
-                        color="sand.600"
-                        initial={{ y: -10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.4 }}
-                      >
-                        Upload your WhatsApp chat and discover the beautiful patterns in your connection
-                      </MotionText>
-                    </CardBody>
-                  </Card>
-                </Box>
-                <Box w="100%" display="flex" justifyContent="center">
-                  <Card bg="white" borderRadius="2xl" boxShadow="lg" w="100%">
-                    <CardBody maxW="720px" mx="auto" w="100%" px={{ base: 4, md: 6 }} py={{ base: 6, md: 8 }}>
-                      <FileUpload onFileProcessed={handleFileProcessed} />
-                    </CardBody>
-                  </Card>
-                </Box>
-              </VStack>
-            </Container>
-          </MotionBox>
-        ) : !selectedParticipant ? (
-          <MotionBox
-            key="selector"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.5 }}
-          >
-            <ParticipantSelector
-              participants={processedData.metadata.participants}
-              onSelectParticipant={handleParticipantSelected}
-            />
-          </MotionBox>
-        ) : (
-          <MotionBox
-            key="dashboard"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <SwipeableCardDashboard chatData={chatData} />
-          </MotionBox>
-        )}
+          {!processedData ? (
+            <MotionBox
+              key="upload"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Container maxW="container.md" py={{ base: 8, md: 20 }} px={{ base: 4, md: 6 }}>
+                <VStack spacing={{ base: 8, md: 10 }} align="stretch">
+                  <Box w="100%" display="flex" justifyContent="center">
+                    <Card bg="white" borderRadius="2xl" boxShadow="xl" w="100%">
+                      <CardBody px={{ base: 6, md: 10 }} py={8} maxW="720px" mx="auto" textAlign="center">
+                        <MotionHeading
+                          size={{ base: "2xl", md: "3xl" }}
+                          mb={4}
+                          color="sand.800"
+                          fontWeight="800"
+                          initial={{ y: -20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: 0.2 }}
+                        >
+                          Isse
+                        </MotionHeading>
+                        <MotionText
+                          fontSize={{ base: "xl", md: "2xl" }}
+                          color="sand.700"
+                          mb={3}
+                          fontWeight="600"
+                          initial={{ y: -10, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: 0.3 }}
+                        >
+                          Your Relationship Coach
+                        </MotionText>
+                        <MotionText
+                          fontSize={{ base: "md", md: "lg" }}
+                          color="sand.600"
+                          initial={{ y: -10, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: 0.4 }}
+                        >
+                          Upload your WhatsApp chat and discover the beautiful patterns in your connection
+                        </MotionText>
+                      </CardBody>
+                    </Card>
+                  </Box>
+                  <Box w="100%" display="flex" justifyContent="center">
+                    <Card bg="white" borderRadius="2xl" boxShadow="lg" w="100%">
+                      <CardBody maxW="720px" mx="auto" w="100%" px={{ base: 4, md: 6 }} py={{ base: 6, md: 8 }}>
+                        <FileUpload onFileProcessed={handleFileProcessed} />
+                      </CardBody>
+                    </Card>
+                  </Box>
+                </VStack>
+              </Container>
+            </MotionBox>
+          ) : !selectedParticipant ? (
+            <MotionBox
+              key="selector"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.5 }}
+            >
+              <ParticipantSelector
+                participants={processedData.metadata.participants}
+                onSelectParticipant={handleParticipantSelected}
+              />
+            </MotionBox>
+          ) : (
+            <MotionBox
+              key="dashboard"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <SwipeableCardDashboard chatData={chatData} />
+            </MotionBox>
+          )}
         </AnimatePresence>
       </Box>
     </Box>

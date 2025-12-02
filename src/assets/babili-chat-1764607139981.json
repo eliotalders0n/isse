@@ -1,0 +1,937 @@
+{
+  "exportedAt": "2025-12-01T16:38:59.962Z",
+  "messageCount": 133,
+  "messages": [
+    {
+      "id": "m1",
+      "sender": "You",
+      "text": "what a waste",
+      "timestamp": null,
+      "rawHtml": "what a waste<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m2",
+      "sender": "You",
+      "text": "I will get you a pet for your room",
+      "timestamp": null,
+      "rawHtml": "I will get you a pet for your room<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m3",
+      "sender": "Unknown",
+      "text": "I like it roasted not boiled",
+      "timestamp": null,
+      "rawHtml": "I like it roasted not boiled<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m4",
+      "sender": "Unknown",
+      "text": "On tbone",
+      "timestamp": null,
+      "rawHtml": "On tbone<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m5",
+      "sender": "You",
+      "text": "yeah",
+      "timestamp": null,
+      "rawHtml": "yeah<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m6",
+      "sender": "You",
+      "text": "babe finish eating",
+      "timestamp": null,
+      "rawHtml": "babe finish eating<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m7",
+      "sender": "You",
+      "text": "youre just making me hungry noq",
+      "timestamp": null,
+      "rawHtml": "youre just making me hungry noq<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m8",
+      "sender": "You",
+      "text": "now",
+      "timestamp": null,
+      "rawHtml": "now<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m9",
+      "sender": "Unknown",
+      "text": "Okay",
+      "timestamp": null,
+      "rawHtml": "Okay<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m10",
+      "sender": "Unknown",
+      "text": "Sorry",
+      "timestamp": null,
+      "rawHtml": "Sorry<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m11",
+      "sender": "You",
+      "text": "i'll be here",
+      "timestamp": null,
+      "rawHtml": "i'll be here<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m12",
+      "sender": "You",
+      "text": "no its okay",
+      "timestamp": null,
+      "rawHtml": "no its okay<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m13",
+      "sender": "You",
+      "text": "hey babe",
+      "timestamp": null,
+      "rawHtml": "hey babe<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m14",
+      "sender": "You",
+      "text": "hows it going?",
+      "timestamp": null,
+      "rawHtml": "hows it going?<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m15",
+      "sender": "Unknown",
+      "text": "I miss karaoke",
+      "timestamp": null,
+      "rawHtml": "I miss karaoke <img data-emoji=\"😿\" class=\"iiJ4W\" alt=\"😿\" aria-label=\"😿\" draggable=\"false\" src=\"https://fonts.gstatic.com/s/e/notoemoji/16.0/1f63f/512.png=s40\" loading=\"lazy\"><span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m16",
+      "sender": "You",
+      "text": "mmm ?",
+      "timestamp": null,
+      "rawHtml": "mmm ?<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m17",
+      "sender": "Unknown",
+      "text": "We should build a music studio in our house",
+      "timestamp": null,
+      "rawHtml": "We should build a music studio in our house<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m18",
+      "sender": "You",
+      "text": "if one of our kids ends a musician dont be surprised",
+      "timestamp": null,
+      "rawHtml": "if one of our kids ends a musician dont be surprised<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m19",
+      "sender": "Unknown",
+      "text": "lol",
+      "timestamp": null,
+      "rawHtml": "lol<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m20",
+      "sender": "Unknown",
+      "text": "Well be singing together for fun",
+      "timestamp": null,
+      "rawHtml": "Well be singing together for fun<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m21",
+      "sender": "You",
+      "text": "we should have instruments though",
+      "timestamp": null,
+      "rawHtml": "we should have instruments though<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m22",
+      "sender": "Unknown",
+      "text": "Babe take me to a music concert",
+      "timestamp": null,
+      "rawHtml": "Babe take me to a music concert<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m23",
+      "sender": "You",
+      "text": "nice way to distress",
+      "timestamp": null,
+      "rawHtml": "nice way to distress<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m24",
+      "sender": "Unknown",
+      "text": "Zambian artists",
+      "timestamp": null,
+      "rawHtml": "Zambian artists<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m25",
+      "sender": "Unknown",
+      "text": "Are you listening to music?",
+      "timestamp": null,
+      "rawHtml": "Are you listening to music?<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m26",
+      "sender": "Unknown",
+      "text": "??????",
+      "timestamp": null,
+      "rawHtml": "??????<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m27",
+      "sender": "You",
+      "text": "not right now",
+      "timestamp": null,
+      "rawHtml": "not right now<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m28",
+      "sender": "You",
+      "text": "mom was asking me something",
+      "timestamp": null,
+      "rawHtml": "mom was asking me something<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m29",
+      "sender": "You",
+      "text": "whats this about",
+      "timestamp": null,
+      "rawHtml": "whats this about<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m30",
+      "sender": "You",
+      "text": "Frankie Phiri, its on spotify",
+      "timestamp": null,
+      "rawHtml": "Frankie Phiri, its on spotify<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m31",
+      "sender": "You",
+      "text": "and others",
+      "timestamp": null,
+      "rawHtml": "and others<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m32",
+      "sender": "You",
+      "text": "sorry mom was talking to me",
+      "timestamp": null,
+      "rawHtml": "sorry mom was talking to me<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m33",
+      "sender": "Unknown",
+      "text": "Oh yes her",
+      "timestamp": null,
+      "rawHtml": "Oh yes her<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m34",
+      "sender": "Unknown",
+      "text": "It’s ok",
+      "timestamp": null,
+      "rawHtml": "It’s ok<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m35",
+      "sender": "You",
+      "text": "Cant listen to the vn and talk to you at the same time",
+      "timestamp": null,
+      "rawHtml": "Cant listen to the vn and talk to you at the same time<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m36",
+      "sender": "You",
+      "text": "now youre singing chalimo lol",
+      "timestamp": null,
+      "rawHtml": "now youre singing chalimo lol<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m37",
+      "sender": "Unknown",
+      "text": "lol yesss",
+      "timestamp": null,
+      "rawHtml": "lol yesss<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m38",
+      "sender": "You",
+      "text": "ahh you its not my birthday yet",
+      "timestamp": null,
+      "rawHtml": "ahh you its not my birthday yet<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m39",
+      "sender": "You",
+      "text": "turning one year old for the 29nth time",
+      "timestamp": null,
+      "rawHtml": "turning one year old for the 29nth time<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m40",
+      "sender": "Unknown",
+      "text": "I’m already celebrating",
+      "timestamp": null,
+      "rawHtml": "I’m already celebrating<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m41",
+      "sender": "You",
+      "text": "lol lets talk about something else",
+      "timestamp": null,
+      "rawHtml": "lol lets talk about something else<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m42",
+      "sender": "Unknown",
+      "text": "Mmm you’ve grown",
+      "timestamp": null,
+      "rawHtml": "Mmm you’ve grown<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m43",
+      "sender": "You",
+      "text": "I will be working anyway",
+      "timestamp": null,
+      "rawHtml": "I will be working anyway<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m44",
+      "sender": "Unknown",
+      "text": "So proud",
+      "timestamp": null,
+      "rawHtml": "So proud<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m45",
+      "sender": "Unknown",
+      "text": "Your a man",
+      "timestamp": null,
+      "rawHtml": "Your a man<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m46",
+      "sender": "You",
+      "text": "now you see why the rush to move out",
+      "timestamp": null,
+      "rawHtml": "now you see why the rush to move out<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m47",
+      "sender": "Unknown",
+      "text": "lol yeah",
+      "timestamp": null,
+      "rawHtml": "lol yeah<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m48",
+      "sender": "You",
+      "text": "been a man for a while now duhhhh",
+      "timestamp": null,
+      "rawHtml": "been a man for a while now duhhhh<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m49",
+      "sender": "Unknown",
+      "text": "lol",
+      "timestamp": null,
+      "rawHtml": "lol<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m50",
+      "sender": "Unknown",
+      "text": "Your more manner",
+      "timestamp": null,
+      "rawHtml": "Your more manner<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m51",
+      "sender": "You",
+      "text": "If you mean more hornier then yeah",
+      "timestamp": null,
+      "rawHtml": "If you mean more hornier then yeah<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m52",
+      "sender": "You",
+      "text": "youve really tortured me",
+      "timestamp": null,
+      "rawHtml": "youve really tortured me<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m53",
+      "sender": "Unknown",
+      "text": "Ahhhhhhhhhhhhhh",
+      "timestamp": null,
+      "rawHtml": "Ahhhhhhhhhhhhhh<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m54",
+      "sender": "Unknown",
+      "text": "lol",
+      "timestamp": null,
+      "rawHtml": "lol<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m55",
+      "sender": "You",
+      "text": "actually feel bad when you ask me to be gentle as if a starving animal wants to a knife and fork to eat its food",
+      "timestamp": null,
+      "rawHtml": "actually feel bad when you ask me to be gentle as if a starving animal wants to a knife and fork to eat its food<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m56",
+      "sender": "Unknown",
+      "text": "Eat like a king babe",
+      "timestamp": null,
+      "rawHtml": "Eat like a king babe<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m57",
+      "sender": "You",
+      "text": "babe please just text im with mome",
+      "timestamp": null,
+      "rawHtml": "babe please just text im with mome<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m58",
+      "sender": "You",
+      "text": "mom",
+      "timestamp": null,
+      "rawHtml": "mom<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m59",
+      "sender": "Unknown",
+      "text": "Not like a savage animal",
+      "timestamp": null,
+      "rawHtml": "Not like a savage animal<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m60",
+      "sender": "Unknown",
+      "text": "Okay sometimes it’s nice",
+      "timestamp": null,
+      "rawHtml": "Okay sometimes it’s nice<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m61",
+      "sender": "Unknown",
+      "text": "But not after so many months babe",
+      "timestamp": null,
+      "rawHtml": "But not after so many months babe<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m62",
+      "sender": "Unknown",
+      "text": "Ahh",
+      "timestamp": null,
+      "rawHtml": "Ahh<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m63",
+      "sender": "You",
+      "text": "when a king goes without eating he becomes babarick",
+      "timestamp": null,
+      "rawHtml": "when a king goes without eating he becomes babarick<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m64",
+      "sender": "Unknown",
+      "text": "Any way",
+      "timestamp": null,
+      "rawHtml": "Any way<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m65",
+      "sender": "Unknown",
+      "text": "My life is in your hands",
+      "timestamp": null,
+      "rawHtml": "My life is in your hands<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m66",
+      "sender": "Unknown",
+      "text": "If you want to kill me you’ll have no wife",
+      "timestamp": null,
+      "rawHtml": "If you want to kill me you’ll have no wife<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m67",
+      "sender": "You",
+      "text": "just dont tell me to have table manners, let me make a mess if i have to",
+      "timestamp": null,
+      "rawHtml": "just dont tell me to have table manners, let me make a mess if i have to<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m68",
+      "sender": "Unknown",
+      "text": "Use your hands yes and eat with your beard but do it slowly",
+      "timestamp": null,
+      "rawHtml": "Use your hands yes and eat with your beard but do it slowly<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m69",
+      "sender": "Unknown",
+      "text": "It’s sealed ka",
+      "timestamp": null,
+      "rawHtml": "It’s sealed ka<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m70",
+      "sender": "You",
+      "text": "no woman im going to ravage you",
+      "timestamp": null,
+      "rawHtml": "no woman im going to ravage you<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m71",
+      "sender": "Unknown",
+      "text": "Ahhhh",
+      "timestamp": null,
+      "rawHtml": "Ahhhh<img data-emoji=\"🏃‍♀️\" class=\"iiJ4W\" alt=\"🏃‍♀️\" aria-label=\"🏃‍♀️\" draggable=\"false\" src=\"https://fonts.gstatic.com/s/e/notoemoji/16.0/1f3c3_200d_2640_fe0f/512.png=s40\" loading=\"lazy\"><img data-emoji=\"🏃‍♀️\" class=\"iiJ4W\" alt=\"🏃‍♀️\" aria-label=\"🏃‍♀️\" draggable=\"false\" src=\"https://fonts.gstatic.com/s/e/notoemoji/16.0/1f3c3_200d_2640_fe0f/512.png=s40\" loading=\"lazy\"><img data-emoji=\"🏃‍♀️\" class=\"iiJ4W\" alt=\"🏃‍♀️\" aria-label=\"🏃‍♀️\" draggable=\"false\" src=\"https://fonts.gstatic.com/s/e/notoemoji/16.0/1f3c3_200d_2640_fe0f/512.png=s40\" loading=\"lazy\"><img data-emoji=\"🏃‍♀️\" class=\"iiJ4W\" alt=\"🏃‍♀️\" aria-label=\"🏃‍♀️\" draggable=\"false\" src=\"https://fonts.gstatic.com/s/e/notoemoji/16.0/1f3c3_200d_2640_fe0f/512.png=s40\" loading=\"lazy\"><img data-emoji=\"🏃‍♀️\" class=\"iiJ4W\" alt=\"🏃‍♀️\" aria-label=\"🏃‍♀️\" draggable=\"false\" src=\"https://fonts.gstatic.com/s/e/notoemoji/16.0/1f3c3_200d_2640_fe0f/512.png=s40\" loading=\"lazy\"><img data-emoji=\"🏃‍♀️\" class=\"iiJ4W\" alt=\"🏃‍♀️\" aria-label=\"🏃‍♀️\" draggable=\"false\" src=\"https://fonts.gstatic.com/s/e/notoemoji/16.0/1f3c3_200d_2640_fe0f/512.png=s40\" loading=\"lazy\"><img data-emoji=\"🏃‍♀️\" class=\"iiJ4W\" alt=\"🏃‍♀️\" aria-label=\"🏃‍♀️\" draggable=\"false\" src=\"https://fonts.gstatic.com/s/e/notoemoji/16.0/1f3c3_200d_2640_fe0f/512.png=s40\" loading=\"lazy\"><img data-emoji=\"🏃‍♀️\" class=\"iiJ4W\" alt=\"🏃‍♀️\" aria-label=\"🏃‍♀️\" draggable=\"false\" src=\"https://fonts.gstatic.com/s/e/notoemoji/16.0/1f3c3_200d_2640_fe0f/512.png=s40\" loading=\"lazy\"><span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m72",
+      "sender": "You",
+      "text": "i wont hurt you buttttt your going to moan chibaba for real",
+      "timestamp": null,
+      "rawHtml": "i wont hurt you buttttt your going to moan chibaba for real<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m73",
+      "sender": "Unknown",
+      "text": "lol",
+      "timestamp": null,
+      "rawHtml": "lol<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m74",
+      "sender": "You",
+      "text": "lol anyway, concertds",
+      "timestamp": null,
+      "rawHtml": "lol anyway, concertds<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m75",
+      "sender": "Unknown",
+      "text": "Okay will see",
+      "timestamp": null,
+      "rawHtml": "Okay will see<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m76",
+      "sender": "You",
+      "text": "concerts",
+      "timestamp": null,
+      "rawHtml": "concerts<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m77",
+      "sender": "Unknown",
+      "text": "25th January",
+      "timestamp": null,
+      "rawHtml": "25th January<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m78",
+      "sender": "You",
+      "text": "I will check when the next one will be for indie alma",
+      "timestamp": null,
+      "rawHtml": "I will check when the next one will be for indie alma<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m79",
+      "sender": "Unknown",
+      "text": "Can’t stop thinking about it",
+      "timestamp": null,
+      "rawHtml": "Can’t stop thinking about it<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m80",
+      "sender": "Unknown",
+      "text": "Okay sure",
+      "timestamp": null,
+      "rawHtml": "Okay sure<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m81",
+      "sender": "You",
+      "text": "lol kwati ni christmas",
+      "timestamp": null,
+      "rawHtml": "lol kwati ni christmas<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m82",
+      "sender": "Unknown",
+      "text": "First thing after kissing you",
+      "timestamp": null,
+      "rawHtml": "First thing after kissing you<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m83",
+      "sender": "Unknown",
+      "text": "I want Viking switch",
+      "timestamp": null,
+      "rawHtml": "I want Viking switch<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m84",
+      "sender": "Unknown",
+      "text": "Come with it when picking me abeg",
+      "timestamp": null,
+      "rawHtml": "Come with it when picking me abeg<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m85",
+      "sender": "You",
+      "text": "I definitely will",
+      "timestamp": null,
+      "rawHtml": "I definitely will<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m86",
+      "sender": "Unknown",
+      "text": "Thank you",
+      "timestamp": null,
+      "rawHtml": "Thank you<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m87",
+      "sender": "Unknown",
+      "text": "Happy birthday",
+      "timestamp": null,
+      "rawHtml": "Happy birthday<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m88",
+      "sender": "You",
+      "text": "babe??????",
+      "timestamp": null,
+      "rawHtml": "babe??????<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m89",
+      "sender": "You",
+      "text": "lol stop that",
+      "timestamp": null,
+      "rawHtml": "lol stop that<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m90",
+      "sender": "Unknown",
+      "text": "Okay okay fine",
+      "timestamp": null,
+      "rawHtml": "Okay okay fine<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m91",
+      "sender": "Unknown",
+      "text": "You look like a monkey anyway",
+      "timestamp": null,
+      "rawHtml": "You look like a monkey anyway<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m92",
+      "sender": "You",
+      "text": "I look like a pregnant monkey",
+      "timestamp": null,
+      "rawHtml": "I look like a pregnant monkey<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m93",
+      "sender": "Unknown",
+      "text": "Yeah",
+      "timestamp": null,
+      "rawHtml": "Yeah<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m94",
+      "sender": "Unknown",
+      "text": "Let me sleep class at 8",
+      "timestamp": null,
+      "rawHtml": "Let me sleep class at 8<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m95",
+      "sender": "Unknown",
+      "text": "I’ll probably wake up at 01 the way I know myself",
+      "timestamp": null,
+      "rawHtml": "I’ll probably wake up at 01 the way I know myself<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m96",
+      "sender": "You",
+      "text": "okay babe, mom is saying hi by the way",
+      "timestamp": null,
+      "rawHtml": "okay babe, mom is saying hi by the way<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m97",
+      "sender": "Unknown",
+      "text": "Good thing I have coffee",
+      "timestamp": null,
+      "rawHtml": "Good thing I have coffee<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m98",
+      "sender": "Unknown",
+      "text": "Ask her at what should I bring for her?",
+      "timestamp": null,
+      "rawHtml": "Ask her at what should I bring for her?<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m99",
+      "sender": "You",
+      "text": "i wanted to ask for the zip before you go",
+      "timestamp": null,
+      "rawHtml": "i wanted to ask for the zip before you go<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m100",
+      "sender": "Unknown",
+      "text": "Send",
+      "timestamp": null,
+      "rawHtml": "Send<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m101",
+      "sender": "You",
+      "text": "mmm babe how much money do you have?",
+      "timestamp": null,
+      "rawHtml": "mmm babe how much money do you have?<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m102",
+      "sender": "Unknown",
+      "text": "I’ll save",
+      "timestamp": null,
+      "rawHtml": "I’ll save<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m103",
+      "sender": "Unknown",
+      "text": "Decembers allowance/ salary",
+      "timestamp": null,
+      "rawHtml": "Decembers allowance/ salary<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m104",
+      "sender": "You",
+      "text": "just get her a necklace",
+      "timestamp": null,
+      "rawHtml": "just get her a necklace<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m105",
+      "sender": "You",
+      "text": "or a pair of shoes",
+      "timestamp": null,
+      "rawHtml": "or a pair of shoes<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m106",
+      "sender": "Unknown",
+      "text": "That’s what she said?",
+      "timestamp": null,
+      "rawHtml": "That’s what she said?<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m107",
+      "sender": "You",
+      "text": "Im saying",
+      "timestamp": null,
+      "rawHtml": "Im saying<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m108",
+      "sender": "Unknown",
+      "text": "Okay",
+      "timestamp": null,
+      "rawHtml": "Okay<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m109",
+      "sender": "You",
+      "text": "for asking asking she doesnt know youre coming, I havent told her",
+      "timestamp": null,
+      "rawHtml": "for asking asking she doesnt know youre coming, I havent told her<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m110",
+      "sender": "You",
+      "text": "I told her you will come in june",
+      "timestamp": null,
+      "rawHtml": "I told her you will come in june<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m111",
+      "sender": "Unknown",
+      "text": "I know was thinking you’d tell her sandra is sending things to Zambia",
+      "timestamp": null,
+      "rawHtml": "I know was thinking you’d tell her sandra is sending things to Zambia<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m112",
+      "sender": "You",
+      "text": "babe just listen to me",
+      "timestamp": null,
+      "rawHtml": "babe just listen to me<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m113",
+      "sender": "Unknown",
+      "text": "I’ve heard",
+      "timestamp": null,
+      "rawHtml": "I’ve heard<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m114",
+      "sender": "Unknown",
+      "text": "I said I was thinking",
+      "timestamp": null,
+      "rawHtml": "I said I was thinking<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m115",
+      "sender": "Unknown",
+      "text": "Was",
+      "timestamp": null,
+      "rawHtml": "Was<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m116",
+      "sender": "Unknown",
+      "text": "Past tense",
+      "timestamp": null,
+      "rawHtml": "Past tense<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m117",
+      "sender": "You",
+      "text": "okay",
+      "timestamp": null,
+      "rawHtml": "okay<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m118",
+      "sender": "You",
+      "text": "please send me the zip for the whatsapp messages",
+      "timestamp": null,
+      "rawHtml": "please send me the zip for the whatsapp messages<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m119",
+      "sender": "You",
+      "text": "ohh no its okay i have it",
+      "timestamp": null,
+      "rawHtml": "ohh no its okay i have it<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m120",
+      "sender": "You",
+      "text": "thanks",
+      "timestamp": null,
+      "rawHtml": "thanks<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m121",
+      "sender": "Unknown",
+      "text": "Okay",
+      "timestamp": null,
+      "rawHtml": "Okay<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m122",
+      "sender": "You",
+      "text": "goodnight babe",
+      "timestamp": null,
+      "rawHtml": "goodnight babe<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m123",
+      "sender": "You",
+      "text": "I love you",
+      "timestamp": null,
+      "rawHtml": "I love you<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m124",
+      "sender": "Unknown",
+      "text": "I love you",
+      "timestamp": null,
+      "rawHtml": "I love you<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m125",
+      "sender": "Unknown",
+      "text": "But why are you in such a hurry to get rid of me?",
+      "timestamp": null,
+      "rawHtml": "But why are you in such a hurry to get rid of me?<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m126",
+      "sender": "You",
+      "text": "???",
+      "timestamp": null,
+      "rawHtml": "???<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m127",
+      "sender": "Unknown",
+      "text": "I know I said i want to sleep but mmmmmmm",
+      "timestamp": null,
+      "rawHtml": "I know I said i want to sleep but mmmmmmm<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m128",
+      "sender": "Unknown",
+      "text": "Goodnight",
+      "timestamp": null,
+      "rawHtml": "Goodnight<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m129",
+      "sender": "You",
+      "text": "im not ina hurry",
+      "timestamp": null,
+      "rawHtml": "im not ina hurry<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m130",
+      "sender": "You",
+      "text": "im not trying to get rid of you, im just following what you said",
+      "timestamp": null,
+      "rawHtml": "im not trying to get rid of you, im just following what you said<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m131",
+      "sender": "Unknown",
+      "text": "Okay",
+      "timestamp": null,
+      "rawHtml": "Okay<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m132",
+      "sender": "Message read by Sandra Masiwa",
+      "text": "Night",
+      "timestamp": null,
+      "rawHtml": "Night<span style=\"display: none;\"></span>"
+    },
+    {
+      "id": "m133",
+      "sender": "You",
+      "text": "goodnight",
+      "timestamp": null,
+      "rawHtml": "goodnight<span style=\"display: none;\"></span>"
+    }
+  ]
+}

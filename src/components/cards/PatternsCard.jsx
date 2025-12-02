@@ -136,8 +136,7 @@ const PatternCard = ({ chatData }) => {
           borderColor="indigo.500"
         >
           <Text color="gray.700" fontSize="md" lineHeight="tall">
-            <strong>Coach's note:</strong> Your patterns show a natural rhythm. The best
-            conversations happen when timing aligns with connection.
+            <strong>Coach's note:</strong> {chatData.sentiment.coachNotes?.patterns || "Your patterns show a natural rhythm. The best conversations happen when timing aligns with connection."}
           </Text>
         </MotionBox>
       </VStack>

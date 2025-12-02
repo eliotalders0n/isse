@@ -15,6 +15,12 @@ const BalanceCard = ({ chatData }) => {
   }));
 
   const getBalanceInsight = () => {
+    // Use AI-enhanced coach note if available
+    if (sentiment.coachNotes?.balance) {
+      return sentiment.coachNotes.balance;
+    }
+
+    // Fallback to keyword-based insights
     if (!selectedParticipant || !personalizedInsights) {
       const participants = Object.values(stats.senderStats);
       if (participants.length !== 2) return "Communication balance looks good!";

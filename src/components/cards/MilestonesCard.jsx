@@ -145,8 +145,7 @@ const MilestonesCard = ({ chatData }) => {
           borderColor="teal.500"
         >
           <Text color="gray.700" fontSize="md" lineHeight="tall">
-            <strong>Coach's note:</strong> Every milestone is a testament to the time and care
-            you've invested in this connection. Celebrate these wins!
+            <strong>Coach's note:</strong> {chatData.sentiment.coachNotes?.milestones || "Every milestone is a testament to the time and care you've invested in this connection. Celebrate these wins!"}
           </Text>
         </MotionBox>
       </VStack>

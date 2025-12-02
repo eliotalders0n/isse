@@ -6,6 +6,7 @@ import IntroCard from './cards/IntroCard';
 import StatsCard from './cards/StatsCard';
 import AboutYouCard from './cards/AboutYouCard';
 import CoachingInsightsCard from './cards/CoachingInsightsCard';
+import AIInsightsCard from './cards/AIInsightsCard';
 import BalanceCard from './cards/BalanceCard';
 import EmotionsCard from './cards/EmotionsCard';
 import WordsCard from './cards/WordsCard';
@@ -25,6 +26,7 @@ const SwipeableCardDashboard = ({ chatData }) => {
     { id: 'stats', component: StatsCard },
     { id: 'aboutyou', component: AboutYouCard },
     { id: 'coaching', component: CoachingInsightsCard },
+    { id: 'aiinsights', component: AIInsightsCard },
     { id: 'balance', component: BalanceCard },
     { id: 'emotions', component: EmotionsCard },
     { id: 'words', component: WordsCard },

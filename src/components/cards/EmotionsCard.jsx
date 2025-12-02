@@ -18,6 +18,12 @@ const EmotionsCard = ({ chatData }) => {
   const COLORS = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'];
 
   const getEmotionalInsight = () => {
+    // Use AI-enhanced coach note if available
+    if (sentiment.coachNotes?.emotions) {
+      return sentiment.coachNotes.emotions;
+    }
+
+    // Fallback to keyword-based insights
     if (sentiment.positivePercent > 70)
       return "Your conversations are filled with warmth and positivity.";
     if (sentiment.positivePercent > 50)

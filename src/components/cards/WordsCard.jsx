@@ -106,8 +106,7 @@ const WordsCard = ({ chatData }) => {
           borderColor="orange.500"
         >
           <Text color="gray.700" fontSize="md" lineHeight="tall">
-            <strong>Coach's note:</strong> The words you use most reveal what matters to you both.
-            These are the threads that weave your story together.
+            <strong>Coach's note:</strong> {chatData.sentiment.coachNotes?.words || "The words you use most reveal what matters to you both. These are the threads that weave your story together."}
           </Text>
         </MotionBox>
       </VStack>
