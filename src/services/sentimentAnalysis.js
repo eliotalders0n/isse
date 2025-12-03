@@ -21,7 +21,7 @@ import {
 } from './sentimentKeywords.js';
 
 // Initialize Gemini AI with fallback models
-const GEMINI_API_KEY = 'AIzaSyAhQitzL_hFAnLOu3jV83HRjG1cyw_kI8c';
+const GEMINI_API_KEY = 'AIzaSyD-mIRAF4-XlhNC5w5BIIMyiJcDRXKAkm4';
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 // Model priority: Latest generation → Previous generation
@@ -90,6 +90,38 @@ export const getCurrentModelInfo = () => {
 };
 
 /**
+ * Detect if conversation contains Zambian/African language patterns
+ * @param {Array} messages - Array of messages
+ * @returns {boolean} True if Zambian/African patterns detected
+ */
+const detectZambianLanguage = (messages) => {
+  const zambianPatterns = [
+    // Nyanja/Bemba/Zambian words
+    'iwe', 'bane', 'manje', 'pa', 'ndine', 'bwanji', 'shani', 'kanshi',
+    'endapo', 'kulibe', 'tili', 'pamodzi', 'ulipo', 'mbuzi', 'fonkopa',
+    'chipuba', 'koswe', 'ati', 'nanga', 'kuti', 'mwa', 'fye',
+    // Common Zambian phrases
+    'ba mama', 'ba dad', 'ba tata', 'mwana', 'abana', 'shikulu',
+    'pa zed', 'pa ground', 'chi', 'ka', 'niwe', 'ine',
+    // Zambian English patterns
+    'iwe babe', 'my person pa', 'we move', 'tiza', 'ninka',
+  ];
+
+  let zambianWordCount = 0;
+  messages.forEach(msg => {
+    const lowerText = msg.text.toLowerCase();
+    zambianPatterns.forEach(pattern => {
+      if (lowerText.includes(pattern)) {
+        zambianWordCount++;
+      }
+    });
+  });
+
+  // If more than 5% of messages contain Zambian patterns, mark as Zambian
+  return zambianWordCount > messages.length * 0.05;
+};
+
+/**
  * Detect conversation context (business, love, friendship, etc.)
  * @param {Array} messages - Array of messages
  * @returns {Object} Context scores and primary context
@@ -120,6 +152,7 @@ export const detectConversationContext = (messages) => {
       primaryContext: 'personal',
       contextScores: {},
       contextPercentages: {},
+      isZambianLanguage: detectZambianLanguage(messages),
     };
   }
 
@@ -136,6 +169,7 @@ export const detectConversationContext = (messages) => {
     primaryContext,
     contextScores,
     contextPercentages,
+    isZambianLanguage: detectZambianLanguage(messages),
   };
 };
 
@@ -203,7 +237,81 @@ export const analyzeSentiment = (text) => {
 
   const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
 
+  // Calculate positive and negative totals BEFORE checking totalScore
+  const overallPositive = scores.joy + scores.affection + scores.gratitude +
+                           scores.excitement + scores.trust + scores.pride;
+  const overallNegative = scores.sadness + scores.anger + scores.anxiety +
+                           scores.apology + scores.betrayal + scores.shame;
+
+  // If no keywords matched, use heuristic analysis as fallback
   if (totalScore === 0) {
+    // Heuristic-based sentiment detection for messages without keyword matches
+    const hasExclamation = text.includes('!');
+    const hasMultipleExclamations = (text.match(/!/g) || []).length >= 2;
+    const hasPositiveEmojis = /[😊😄😁❤️💕💖😍🥰😘🎉🎊👏🔥✨💯👍🙌😃😀🥳]/.test(text);
+    const hasNegativeEmojis = /[😢😭😔☹️😞💔😥😪🥺😰😨😱😠😡🤬]/.test(text);
+    const messageLength = text.length;
+    const wordCount = text.split(/\s+/).length;
+
+    // Very short messages (< 3 words) are usually neutral unless they have emojis or exclamation
+    if (wordCount < 3 && messageLength < 15) {
+      if (hasPositiveEmojis || (hasExclamation && !hasNegativeEmojis)) {
+        return {
+          sentiment: 'positive',
+          scores: { joy: 0.5, ...scores },
+          confidence: 0.3,
+          primaryEmotion: 'joy',
+          secondaryEmotions: [],
+          emotionalComplexity: 0,
+        };
+      } else if (hasNegativeEmojis) {
+        return {
+          sentiment: 'negative',
+          scores: { sadness: 0.5, ...scores },
+          confidence: 0.3,
+          primaryEmotion: 'sadness',
+          secondaryEmotions: [],
+          emotionalComplexity: 0,
+        };
+      }
+    }
+
+    // Messages with multiple exclamations often express excitement or anger
+    if (hasMultipleExclamations) {
+      if (hasPositiveEmojis) {
+        return {
+          sentiment: 'positive',
+          scores: { excitement: 1, ...scores },
+          confidence: 0.4,
+          primaryEmotion: 'excitement',
+          secondaryEmotions: [],
+          emotionalComplexity: 0,
+        };
+      }
+    }
+
+    // Emoji-based sentiment
+    if (hasPositiveEmojis && !hasNegativeEmojis) {
+      return {
+        sentiment: 'positive',
+        scores: { joy: 0.5, ...scores },
+        confidence: 0.4,
+        primaryEmotion: 'joy',
+        secondaryEmotions: [],
+        emotionalComplexity: 0,
+      };
+    } else if (hasNegativeEmojis && !hasPositiveEmojis) {
+      return {
+        sentiment: 'negative',
+        scores: { sadness: 0.5, ...scores },
+        confidence: 0.4,
+        primaryEmotion: 'sadness',
+        secondaryEmotions: [],
+        emotionalComplexity: 0,
+      };
+    }
+
+    // Default to neutral for messages we can't classify
     return {
       sentiment: 'neutral',
       scores,
@@ -222,12 +330,7 @@ export const analyzeSentiment = (text) => {
   const primaryEmotion = sortedEmotions[0][0];
   const secondaryEmotions = sortedEmotions.slice(1, 3).map(([emotion]) => emotion);
 
-  // Calculate overall sentiment
-  const overallPositive = scores.joy + scores.affection + scores.gratitude +
-                           scores.excitement + scores.trust + scores.pride;
-  const overallNegative = scores.sadness + scores.anger + scores.anxiety +
-                           scores.apology + scores.betrayal + scores.shame;
-
+  // Determine overall sentiment (already calculated above)
   let sentiment = 'neutral';
   if (overallPositive > overallNegative) {
     sentiment = 'positive';
@@ -511,7 +614,17 @@ export const analyzeChatSentiment = (messages, useAI = false) => {
 };
 
 /**
+ * Check if this is a group chat (3+ participants)
+ * @param {Array} participants - Array of participant names
+ * @returns {boolean} True if group chat
+ */
+export const isGroupChat = (participants) => {
+  return participants && participants.length >= 3;
+};
+
+/**
  * Analyze relationship dynamics and communication health
+ * Supports both 1-on-1 conversations and group chats
  * @param {Array} messages - Array of messages with sentiment
  * @param {Array} participants - Participant names
  * @returns {Object} Relationship dynamics analysis
@@ -524,49 +637,105 @@ export const analyzeRelationshipDynamics = (messages, participants) => {
       supportLevel: 50,
       conflictLevel: 0,
       trustLevel: 50,
+      isGroupChat: false,
     };
   }
 
-  const [person1, person2] = participants;
+  const isGroup = isGroupChat(participants);
 
   // Group messages by sender
-  const person1Messages = messages.filter(m => m.sender === person1);
-  const person2Messages = messages.filter(m => m.sender === person2);
-
-  // Communication balance
-  const communicationBalance = Math.round(
-    (person1Messages.length / messages.length) * 100
-  );
-
-  // Emotional reciprocity (do they express similar emotions?)
-  const person1Emotions = {};
-  const person2Emotions = {};
-
-  person1Messages.forEach(msg => {
-    const emotion = msg.sentiment?.primaryEmotion || 'neutral';
-    person1Emotions[emotion] = (person1Emotions[emotion] || 0) + 1;
+  const messagesBySender = {};
+  participants.forEach(p => {
+    messagesBySender[p] = messages.filter(m => m.sender === p);
   });
 
-  person2Messages.forEach(msg => {
-    const emotion = msg.sentiment?.primaryEmotion || 'neutral';
-    person2Emotions[emotion] = (person2Emotions[emotion] || 0) + 1;
+  // Communication balance (for groups, calculate distribution variance)
+  let communicationBalance;
+  const messageDistribution = {};
+
+  if (isGroup) {
+    // For groups: Calculate how evenly distributed messages are (0-100, higher = more balanced)
+    const messageCounts = participants.map(p => messagesBySender[p]?.length || 0);
+    const totalMessages = messageCounts.reduce((sum, count) => sum + count, 0);
+    const avgMessages = totalMessages / participants.length;
+
+    // Calculate variance from average
+    const variance = messageCounts.reduce((sum, count) => {
+      return sum + Math.pow(count - avgMessages, 2);
+    }, 0) / participants.length;
+
+    const stdDev = Math.sqrt(variance);
+    const coefficientOfVariation = avgMessages > 0 ? (stdDev / avgMessages) * 100 : 100;
+
+    // Convert to balance score (lower variation = higher balance)
+    communicationBalance = Math.round(Math.max(0, 100 - coefficientOfVariation));
+
+    participants.forEach(p => {
+      messageDistribution[p] = messagesBySender[p]?.length || 0;
+    });
+  } else {
+    // For 1-on-1: Calculate percentage for first person
+    const [person1, person2] = participants;
+    communicationBalance = Math.round(
+      (messagesBySender[person1].length / messages.length) * 100
+    );
+    messageDistribution[person1] = messagesBySender[person1].length;
+    messageDistribution[person2] = messagesBySender[person2].length;
+  }
+
+  // Emotional reciprocity (works for both groups and 1-on-1)
+  const emotionsBySender = {};
+  participants.forEach(sender => {
+    emotionsBySender[sender] = {};
+    const senderMessages = messagesBySender[sender] || [];
+    senderMessages.forEach(msg => {
+      const emotion = msg.sentiment?.primaryEmotion || 'neutral';
+      emotionsBySender[sender][emotion] = (emotionsBySender[sender][emotion] || 0) + 1;
+    });
   });
 
-  // Calculate emotional reciprocity
+  // Calculate emotional similarity across all participants
   let reciprocityScore = 0;
-  const allEmotions = new Set([
-    ...Object.keys(person1Emotions),
-    ...Object.keys(person2Emotions)
-  ]);
-
-  allEmotions.forEach(emotion => {
-    const p1Ratio = (person1Emotions[emotion] || 0) / person1Messages.length;
-    const p2Ratio = (person2Emotions[emotion] || 0) / person2Messages.length;
-    reciprocityScore += Math.abs(p1Ratio - p2Ratio);
+  const allEmotions = new Set();
+  Object.values(emotionsBySender).forEach(emotions => {
+    Object.keys(emotions).forEach(emotion => allEmotions.add(emotion));
   });
+
+  // For groups: Calculate average pairwise emotional similarity
+  if (isGroup && participants.length > 2) {
+    let pairCount = 0;
+    for (let i = 0; i < participants.length; i++) {
+      for (let j = i + 1; j < participants.length; j++) {
+        const p1 = participants[i];
+        const p2 = participants[j];
+        const p1Messages = messagesBySender[p1]?.length || 1;
+        const p2Messages = messagesBySender[p2]?.length || 1;
+
+        allEmotions.forEach(emotion => {
+          const p1Ratio = (emotionsBySender[p1]?.[emotion] || 0) / p1Messages;
+          const p2Ratio = (emotionsBySender[p2]?.[emotion] || 0) / p2Messages;
+          reciprocityScore += Math.abs(p1Ratio - p2Ratio);
+        });
+        pairCount++;
+      }
+    }
+    reciprocityScore = reciprocityScore / (pairCount * allEmotions.size);
+  } else {
+    // Original 1-on-1 logic
+    const [person1, person2] = participants;
+    const p1Messages = messagesBySender[person1]?.length || 1;
+    const p2Messages = messagesBySender[person2]?.length || 1;
+
+    allEmotions.forEach(emotion => {
+      const p1Ratio = (emotionsBySender[person1]?.[emotion] || 0) / p1Messages;
+      const p2Ratio = (emotionsBySender[person2]?.[emotion] || 0) / p2Messages;
+      reciprocityScore += Math.abs(p1Ratio - p2Ratio);
+    });
+    reciprocityScore = reciprocityScore / allEmotions.size;
+  }
 
   const emotionalReciprocity = Math.round(
-    Math.max(0, 100 - (reciprocityScore / allEmotions.size) * 100)
+    Math.max(0, 100 - reciprocityScore * 100)
   );
 
   // Support level (how often do they use supportive language?)
@@ -607,10 +776,9 @@ export const analyzeRelationshipDynamics = (messages, participants) => {
     supportLevel,
     conflictLevel,
     trustLevel,
-    messageDistribution: {
-      [person1]: person1Messages.length,
-      [person2]: person2Messages.length,
-    },
+    messageDistribution,
+    isGroupChat: isGroup,
+    participantCount: participants.length,
   };
 };
 
@@ -837,6 +1005,65 @@ const generateInsights = (data) => {
   const insights = [];
   const context = data.conversationContext?.primaryContext || 'personal';
   const dynamics = data.relationshipDynamics || {};
+  const isGroup = dynamics.isGroupChat || false;
+
+  // Group-specific insights
+  if (isGroup) {
+    // Participation balance insights
+    if (dynamics.communicationBalance >= 70) {
+      insights.push('⚖️ Excellent group balance - everyone contributes fairly equally!');
+    } else if (dynamics.communicationBalance >= 50) {
+      insights.push('👥 Moderate balance - most members are actively participating.');
+    } else if (dynamics.communicationBalance < 30) {
+      insights.push('📊 Participation imbalance - some members are much more active than others.');
+    }
+
+    // Most active participant insights
+    const messageDistribution = dynamics.messageDistribution || {};
+    const sortedParticipants = Object.entries(messageDistribution)
+      .sort((a, b) => b[1] - a[1]);
+
+    if (sortedParticipants.length > 0) {
+      const [mostActive, mostActiveCount] = sortedParticipants[0];
+      const totalMessages = Object.values(messageDistribution).reduce((sum, count) => sum + count, 0);
+      const activePercent = Math.round((mostActiveCount / totalMessages) * 100);
+
+      if (activePercent > 50) {
+        insights.push(`💬 ${mostActive} dominates the conversation with ${activePercent}% of messages.`);
+      } else if (activePercent < 20 && sortedParticipants.length >= 4) {
+        insights.push(`🌟 Well-distributed conversation - no single person dominates!`);
+      }
+    }
+
+    // Group cohesion insights
+    if (dynamics.emotionalReciprocity > 70) {
+      insights.push('💞 Strong group cohesion - members share similar emotional patterns.');
+    } else if (dynamics.emotionalReciprocity < 40) {
+      insights.push('🎭 Diverse emotional expressions - each member brings unique energy.');
+    }
+
+    // Group support level
+    if (dynamics.supportLevel > 60) {
+      insights.push('🤝 Highly supportive group culture - members lift each other up.');
+    }
+
+    // Group conflict insights
+    if (dynamics.conflictLevel > 25) {
+      insights.push('⚡ Notable group tension - may benefit from team building or conflict resolution.');
+    } else if (dynamics.conflictLevel < 10) {
+      insights.push('☮️ Harmonious group dynamic with minimal conflict.');
+    }
+
+    // Size-specific insights
+    if (dynamics.participantCount >= 5) {
+      insights.push(`👥 Large group of ${dynamics.participantCount} members - impressive coordination!`);
+    } else if (dynamics.participantCount === 3) {
+      insights.push('🔺 Trio dynamic - three-way conversations can be especially engaging!');
+    }
+  }
+
+  // Cultural context marker
+  const isZambian = data.conversationContext?.isZambianLanguage || false;
 
   // Context-specific insights
   if (context === 'business' || context === 'professional') {
@@ -867,10 +1094,14 @@ const generateInsights = (data) => {
   } else if (context === 'love') {
     // Romantic relationship insights
     if (data.topEmotions.includes('affection') && data.overallPositivePercent > 70) {
-      insights.push('💕 Strong affectionate bond with predominantly positive communication.');
+      insights.push(isZambian
+        ? '💕 Strong affectionate bond - your love language shines through clearly.'
+        : '💕 Strong affectionate bond with predominantly positive communication.');
     }
     if (dynamics.emotionalReciprocity > 70) {
-      insights.push('💝 High emotional reciprocity - you mirror each other\'s feelings beautifully.');
+      insights.push(isZambian
+        ? '💝 High emotional connection - you understand each other deeply (tili pamodzi).'
+        : '💝 High emotional reciprocity - you mirror each other\'s feelings beautifully.');
     }
     if (dynamics.trustLevel > 75) {
       insights.push('🔐 Deep trust foundation evident in your conversations.');
@@ -880,6 +1111,12 @@ const generateInsights = (data) => {
     }
     if (dynamics.conflictLevel < 10 && data.avgMessagesPerDay > 20) {
       insights.push('✨ Healthy, active relationship with minimal conflict.');
+    }
+    // Zambian-specific romantic insight
+    if (isZambian) {
+      if (data.avgMessagesPerDay > 15) {
+        insights.push('📱 You stay connected throughout the day - real commitment showing.');
+      }
     }
   } else if (context === 'friendship') {
     // Friendship insights
@@ -895,10 +1132,18 @@ const generateInsights = (data) => {
   } else if (context === 'family') {
     // Family insights
     if (data.topEmotions.includes('gratitude') || data.topEmotions.includes('affection')) {
-      insights.push('👨‍👩‍👧‍👦 Family bond showing appreciation and care.');
+      insights.push(isZambian
+        ? '👨‍👩‍👧‍👦 Family bond showing care and respect - family values are strong here.'
+        : '👨‍👩‍👧‍👦 Family bond showing appreciation and care.');
     }
     if (dynamics.conflictLevel > 25) {
       insights.push('⚠️ Some family tension present - open communication may help.');
+    }
+    // Zambian family context
+    if (isZambian) {
+      if (dynamics.supportLevel > 60) {
+        insights.push('🏡 Strong family support system - taking care of each other.');
+      }
     }
   } else if (context === 'technical') {
     // Technical/Development insights
@@ -957,22 +1202,32 @@ const generateInsights = (data) => {
 
   // Communication pattern insights
   if (data.dominantCommunicationPattern === 'supportive') {
-    insights.push('💪 Predominantly supportive communication style - very encouraging.');
+    insights.push(isZambian
+      ? '💪 Predominantly supportive communication - you lift each other up consistently.'
+      : '💪 Predominantly supportive communication style - very encouraging.');
   } else if (data.dominantCommunicationPattern === 'passiveAggressive') {
-    insights.push('⚠️ Some passive-aggressive patterns detected - direct communication may be beneficial.');
+    insights.push(isZambian
+      ? '⚠️ Some indirect communication patterns - speaking directly may help clear the air.'
+      : '⚠️ Some passive-aggressive patterns detected - direct communication may be beneficial.');
   } else if (data.dominantCommunicationPattern === 'defensive') {
     insights.push('🛡️ Defensive communication present - vulnerability and openness may improve connection.');
   } else if (data.dominantCommunicationPattern === 'assertive') {
-    insights.push('💬 Healthy assertive communication - clear and direct expression of needs.');
+    insights.push(isZambian
+      ? '💬 Healthy direct communication - you both speak your mind clearly.'
+      : '💬 Healthy assertive communication - clear and direct expression of needs.');
   }
 
   // Balance insights
-  if (dynamics.communicationBalance) {
+  if (dynamics.communicationBalance && !isGroup) {
     const balance = Math.abs(50 - dynamics.communicationBalance);
     if (balance > 30) {
-      insights.push('📊 Significant imbalance in message contribution - one person initiates more often.');
+      insights.push(isZambian
+        ? '📊 One person is more active in chatting - both voices matter equally though.'
+        : '📊 Significant imbalance in message contribution - one person initiates more often.');
     } else if (balance < 10) {
-      insights.push('⚖️ Excellent balance - both participants contribute equally.');
+      insights.push(isZambian
+        ? '⚖️ Excellent balance - you both contribute equally to conversations.'
+        : '⚖️ Excellent balance - both participants contribute equally.');
     }
   }
 
@@ -985,9 +1240,20 @@ const generateInsights = (data) => {
 
   if (dynamics.conflictLevel) {
     if (dynamics.conflictLevel < 10) {
-      insights.push('☮️ Very low conflict - harmonious communication.');
+      insights.push(isZambian
+        ? '☮️ Very low conflict - peaceful communication style (kulibe drama).'
+        : '☮️ Very low conflict - harmonious communication.');
     } else if (dynamics.conflictLevel > 30) {
-      insights.push('⚡ Elevated conflict levels - may benefit from conflict resolution strategies.');
+      insights.push(isZambian
+        ? '⚡ Some tension showing - talking things through may help bring peace.'
+        : '⚡ Elevated conflict levels - may benefit from conflict resolution strategies.');
+    }
+  }
+
+  // Cultural communication insight
+  if (isZambian && insights.length < 7) {
+    if (data.avgMessagesPerDay > 10) {
+      insights.push('🌍 Regular WhatsApp communication - staying connected despite busy schedules.');
     }
   }
 
@@ -1188,7 +1454,8 @@ export const detectToxicity = (messages) => {
       toxicityBreakdown: {},
       toxicityPercent: 0,
       level: 'healthy',
-      patterns: []
+      patterns: [],
+      hasCulturalLanguage: false,
     };
   }
 
@@ -1202,11 +1469,16 @@ export const detectToxicity = (messages) => {
 
   let toxicMessageCount = 0;
   const patterns = [];
+  let zambianToxicCount = 0;
+
+  // Common Zambian/African words that might appear harsh but are context-dependent
+  const contextDependentWords = ['iwe', 'manje', 'ati', 'chi', 'ka'];
 
   messages.forEach((msg, idx) => {
     const text = msg.text.toLowerCase();
     let isToxic = false;
     const foundCategories = [];
+    let hasContextDependent = contextDependentWords.some(word => text.includes(word));
 
     Object.entries(toxicityKeywords).forEach(([category, keywords]) => {
       keywords.forEach(keyword => {
@@ -1216,9 +1488,20 @@ export const detectToxicity = (messages) => {
           if (!foundCategories.includes(category)) {
             foundCategories.push(category);
           }
+          // Track if Zambian language is used
+          if (['mbuzi', 'fonkopa', 'chipuba', 'koswe', 'iwe chi', 'niwe', 'nika', 'ndeku'].some(z => keyword.includes(z))) {
+            zambianToxicCount++;
+          }
         }
       });
     });
+
+    // Reduce toxicity score if message has context-dependent words but isn't strongly toxic
+    // This accounts for cultural communication styles
+    if (isToxic && hasContextDependent && foundCategories.length === 1) {
+      // Only one category flagged and has cultural context - might be heated discussion rather than toxic
+      isToxic = foundCategories[0] === 'aggression' || foundCategories[0] === 'insults';
+    }
 
     if (isToxic) {
       toxicMessageCount++;
@@ -1226,7 +1509,8 @@ export const detectToxicity = (messages) => {
         messageIndex: idx,
         sender: msg.sender,
         categories: foundCategories,
-        timestamp: msg.timestamp
+        timestamp: msg.timestamp,
+        hasCulturalContext: hasContextDependent,
       });
     }
   });
@@ -1236,13 +1520,17 @@ export const detectToxicity = (messages) => {
   // Calculate overall toxicity score (0-100, lower is better)
   const toxicityScore = Math.round(toxicityPercent);
 
-  // Determine toxicity level
+  // Determine toxicity level with cultural awareness
+  // If Zambian language is used, be more lenient as some words might be heated but not abusive
+  const culturalAdjustment = zambianToxicCount > 0 ? 0.7 : 1.0;
+  const adjustedScore = toxicityScore * culturalAdjustment;
+
   let level = 'healthy';
-  if (toxicityScore > 10) {
+  if (adjustedScore > 10) {
     level = 'concerning';
-  } else if (toxicityScore > 5) {
+  } else if (adjustedScore > 5) {
     level = 'needs attention';
-  } else if (toxicityScore > 2) {
+  } else if (adjustedScore > 2) {
     level = 'moderate';
   }
 
@@ -1252,7 +1540,8 @@ export const detectToxicity = (messages) => {
     toxicityBreakdown,
     toxicityPercent: Math.round(toxicityPercent * 10) / 10,
     level,
-    patterns: patterns.slice(0, 10) // Return top 10 patterns
+    patterns: patterns.slice(0, 10), // Return top 10 patterns
+    hasCulturalLanguage: zambianToxicCount > 0,
   };
 };
 

@@ -19,7 +19,7 @@ import {
 
 const MotionCard = motion(ChakraCard);
 
-const CoachingInsightsCard = ({ chatData }) => {
+const CoachingInsightsCard = ({ chatData = {} }) => {
   const { coachingInsights, selectedParticipant } = chatData;
 
   if (!coachingInsights || coachingInsights.length === 0) {

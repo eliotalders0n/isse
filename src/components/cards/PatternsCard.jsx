@@ -4,8 +4,12 @@ import { FiClock, FiZap, FiTrendingUp } from 'react-icons/fi';
 
 const MotionBox = motion(Box);
 
-const PatternCard = ({ chatData }) => {
-  const { analytics, stats } = chatData;
+const PatternCard = ({ chatData = {} }) => {
+  const {
+    analytics = { peakHours: [], avgMessagesPerDay: 0 },
+    stats = { responseTimes: { averageMinutes: 0 } },
+    sentiment = { coachNotes: {} }
+  } = chatData;
 
   const avgResponseTime = stats.responseTimes?.averageMinutes || 0;
   const peakHours = analytics.peakHours || [];
@@ -136,7 +140,7 @@ const PatternCard = ({ chatData }) => {
           borderColor="indigo.500"
         >
           <Text color="gray.700" fontSize="md" lineHeight="tall">
-            <strong>Coach's note:</strong> {chatData.sentiment.coachNotes?.patterns || "Your patterns show a natural rhythm. The best conversations happen when timing aligns with connection."}
+            <strong>Coach's note:</strong> {sentiment.coachNotes?.patterns || "Your patterns show a natural rhythm. The best conversations happen when timing aligns with connection."}
           </Text>
         </MotionBox>
       </VStack>

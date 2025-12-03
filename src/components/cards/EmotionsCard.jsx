@@ -4,8 +4,16 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts
 
 const MotionBox = motion(Box);
 
-const EmotionsCard = ({ chatData }) => {
-  const { sentiment } = chatData;
+const EmotionsCard = ({ chatData = {} }) => {
+  const {
+    sentiment = {
+      emotionBreakdown: {},
+      positivePercent: 0,
+      neutralPercent: 0,
+      negativePercent: 0,
+      coachNotes: {}
+    }
+  } = chatData;
 
   const emotionData = Object.entries(sentiment.emotionBreakdown || {})
     .map(([emotion, count]) => ({
