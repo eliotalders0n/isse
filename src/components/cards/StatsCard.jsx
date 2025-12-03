@@ -29,8 +29,12 @@ const StatItem = ({ icon, label, value, color, delay }) => (
   </MotionBox>
 );
 
-const StatsCard = ({ chatData }) => {
-  const { metadata, analytics, sentiment } = chatData;
+const StatsCard = ({ chatData = {} }) => {
+  const {
+    metadata = { totalMessages: 0 },
+    analytics = { totalDays: 0, avgMessagesPerDay: 0 },
+    sentiment = { overallSentiment: 'Neutral', coachNotes: {} }
+  } = chatData;
 
   return (
     <Box

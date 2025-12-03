@@ -5,8 +5,12 @@ import ParticipantAvatar from '../ParticipantAvatar';
 
 const MotionBox = motion(Box);
 
-const WordsCard = ({ chatData }) => {
-  const { analytics, stats } = chatData;
+const WordsCard = ({ chatData = {} }) => {
+  const {
+    analytics = { wordFrequencyPerSender: {}, totalDays: 0 },
+    stats = { senderStats: {} },
+    sentiment = { coachNotes: {} }
+  } = chatData;
 
   // Get top words per sender
   const topWordsBySender = analytics.wordFrequencyPerSender || {};
@@ -106,7 +110,7 @@ const WordsCard = ({ chatData }) => {
           borderColor="orange.500"
         >
           <Text color="gray.700" fontSize="md" lineHeight="tall">
-            <strong>Coach's note:</strong> {chatData.sentiment.coachNotes?.words || "The words you use most reveal what matters to you both. These are the threads that weave your story together."}
+            <strong>Coach's note:</strong> {sentiment.coachNotes?.words || "The words you use most reveal what matters to you both. These are the threads that weave your story together."}
           </Text>
         </MotionBox>
       </VStack>

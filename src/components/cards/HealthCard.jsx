@@ -4,8 +4,15 @@ import { FiTrendingUp, FiClock, FiAward } from 'react-icons/fi';
 
 const MotionBox = motion(Box);
 
-const HealthCard = ({ chatData }) => {
-  const { sentiment, analytics } = chatData;
+const HealthCard = ({ chatData = {} }) => {
+  const {
+    sentiment = {
+      communicationHealth: 'moderate',
+      aiPowered: false,
+      coachNotes: {}
+    },
+    analytics = { streaks: [], peakHours: [] }
+  } = chatData;
 
   return (
     <Box

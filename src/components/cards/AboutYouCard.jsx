@@ -22,7 +22,7 @@ import {
 
 const MotionBox = motion(Box);
 
-const AboutYouCard = ({ chatData }) => {
+const AboutYouCard = ({ chatData = {} }) => {
   const {
     personalizedInsights,
     personalizedSentiment,

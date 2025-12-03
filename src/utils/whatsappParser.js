@@ -300,6 +300,7 @@ const SYSTEM_MESSAGE_PATTERNS = [
   /^Live location shared/i,
   /joined using this group's invite link/i,
   /added you/i,
+  /You added/i,
   /added .+/i,
   /left$/i,
   /removed .+/i,
@@ -308,9 +309,54 @@ const SYSTEM_MESSAGE_PATTERNS = [
   /changed the group description/i,
   /Security code changed/i,
   /created group/i,
+  /created this group/i,
   /changed their phone number/i,
   /Your security code with/i,
 ];
+
+/**
+ * Patterns to identify system/group name senders (not actual participants)
+ * Group names often contain keywords like "Group", "Team", "Staff", etc.
+ */
+const SYSTEM_SENDER_PATTERNS = [
+  /\s+Group$/i,           // Ends with "Group"
+  /^.*\s+(All Staff|Team|Department|Committee)/i,  // Common organizational patterns
+  /^Messages and calls/i,
+  /^\s*$/,                // Empty sender
+  /\s+-\s+(Lite|Full|Official|Main)$/i,  // Ends with modifiers like "- Lite"
+];
+
+/**
+ * Check if a sender name is a system sender (group name, etc.)
+ * Uses pattern matching only - frequency filtering was too aggressive
+ * @param {string} sender - Sender name
+ * @param {Array} allSenders - All sender names with message counts (optional, for future use)
+ * @returns {boolean} True if it's a system sender
+ */
+const isSystemSender = (sender, allSenders = null) => {
+  // Check pattern matching for known system sender patterns
+  if (SYSTEM_SENDER_PATTERNS.some(pattern => pattern.test(sender))) {
+    return true;
+  }
+
+  // Don't filter based on message count - participants can be quiet!
+  // The pattern matching should catch actual group names and system senders
+
+  return false;
+};
+
+/**
+ * Clean participant name by removing WhatsApp prefixes
+ * @param {string} name - Raw participant name
+ * @returns {string} Cleaned name
+ */
+const cleanParticipantName = (name) => {
+  // Remove leading tilde and space
+  let cleaned = name.replace(/^~\s*/, '');
+  // Trim whitespace
+  cleaned = cleaned.trim();
+  return cleaned;
+};
 
 /**
  * Check if a message is a system message
@@ -384,17 +430,19 @@ export const parseWhatsAppChat = (fileContent) => {
 
     if (match) {
       // Save previous message if exists and it's not a system message
-      if (currentMessage && !isSystemMessage(currentMessage.text)) {
+      if (currentMessage && !isSystemMessage(currentMessage.text) && !isSystemSender(currentMessage.sender)) {
         messages.push(currentMessage);
       }
 
       // Create new message
       const [, date, time, sender, text] = match;
+      const cleanedSender = cleanParticipantName(sender.trim());
+
       currentMessage = {
         date,
         time,
         timestamp: parseTimestamp(date, time, dateFormat),
-        sender: sender.trim(),
+        sender: cleanedSender,
         text: text.trim(),
       };
     } else if (currentMessage) {
@@ -403,25 +451,38 @@ export const parseWhatsAppChat = (fileContent) => {
     }
   });
 
-  // Don't forget the last message (if it's not a system message)
-  if (currentMessage && !isSystemMessage(currentMessage.text)) {
+  // Don't forget the last message (if it's not a system message or system sender)
+  if (currentMessage && !isSystemMessage(currentMessage.text) && !isSystemSender(currentMessage.sender)) {
     messages.push(currentMessage);
   }
 
-  // Extract unique senders
-  const senders = [...new Set(messages.map(m => m.sender))];
+  // Count messages per sender for frequency analysis
+  const senderCounts = {};
+  messages.forEach(msg => {
+    senderCounts[msg.sender] = (senderCounts[msg.sender] || 0) + 1;
+  });
+
+  // Create sender frequency array
+  const senderFrequency = Object.entries(senderCounts).map(([name, count]) => ({ name, count }));
+
+  // Extract unique senders and filter out system senders (with frequency data)
+  const allSenders = [...new Set(messages.map(m => m.sender))];
+  const senders = allSenders.filter(sender => !isSystemSender(sender, senderFrequency));
+
+  // Filter messages to only include valid participants
+  const validMessages = messages.filter(msg => senders.includes(msg.sender));
 
   // Calculate metadata
   const metadata = {
-    totalMessages: messages.length,
+    totalMessages: validMessages.length,
     participants: senders,
-    startDate: messages[0]?.timestamp,
-    endDate: messages[messages.length - 1]?.timestamp,
+    startDate: validMessages[0]?.timestamp,
+    endDate: validMessages[validMessages.length - 1]?.timestamp,
     dateFormat: dateFormat,
   };
 
   return {
-    messages,
+    messages: validMessages,
     metadata,
   };
 };

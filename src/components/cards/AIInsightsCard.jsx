@@ -12,8 +12,8 @@ import { FiCpu, FiZap, FiTarget, FiTrendingUp } from 'react-icons/fi';
 
 const MotionBox = motion(Box);
 
-const AIInsightsCard = ({ chatData }) => {
-    const { sentiment } = chatData;
+const AIInsightsCard = ({ chatData = {} }) => {
+    const { sentiment = {} } = chatData;
 
     // If no AI insights, don't render this card
     if (!sentiment?.aiPowered || !sentiment?.aiInsights) {

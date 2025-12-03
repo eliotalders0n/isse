@@ -4,8 +4,14 @@ import ParticipantAvatar from '../ParticipantAvatar';
 
 const MotionBox = motion(Box);
 
-const BalanceCard = ({ chatData }) => {
-  const { stats, metadata, sentiment, selectedParticipant, personalizedInsights } = chatData;
+const BalanceCard = ({ chatData = {} }) => {
+  const {
+    stats = { senderStats: {} },
+    metadata = { totalMessages: 1, participants: [] },
+    sentiment = {},
+    selectedParticipant,
+    personalizedInsights
+  } = chatData;
 
   const messageDistribution = Object.entries(stats.senderStats || {}).map(([sender, data]) => ({
     sender,
@@ -20,7 +26,33 @@ const BalanceCard = ({ chatData }) => {
       return sentiment.coachNotes.balance;
     }
 
-    // Fallback to keyword-based insights
+    const participantCount = Object.keys(stats.senderStats || {}).length;
+    const isGroupChat = participantCount >= 3;
+
+    // Group chat insights
+    if (isGroupChat) {
+      const messageCounts = Object.values(stats.senderStats).map(s => s.messageCount);
+      const maxMessages = Math.max(...messageCounts);
+      const minMessages = Math.min(...messageCounts);
+      const avgMessages = messageCounts.reduce((sum, count) => sum + count, 0) / participantCount;
+      const variance = messageCounts.reduce((sum, count) => sum + Math.pow(count - avgMessages, 2), 0) / participantCount;
+      const stdDev = Math.sqrt(variance);
+      const balanceScore = avgMessages > 0 ? 100 - (stdDev / avgMessages) * 100 : 50;
+
+      if (balanceScore >= 70) {
+        return `Excellent group balance! All ${participantCount} members contribute fairly equally.`;
+      } else if (balanceScore >= 50) {
+        return `Moderate balance among ${participantCount} members - most are actively participating.`;
+      } else {
+        const ratio = maxMessages / minMessages;
+        if (ratio > 5) {
+          return `Some members are much more active than others. Consider engaging quieter members!`;
+        }
+        return `Participation varies - some members are more active than others in the group.`;
+      }
+    }
+
+    // 1-on-1 chat insights
     if (!selectedParticipant || !personalizedInsights) {
       const participants = Object.values(stats.senderStats);
       if (participants.length !== 2) return "Communication balance looks good!";
@@ -46,6 +78,9 @@ const BalanceCard = ({ chatData }) => {
     }
   };
 
+  const participantCount = messageDistribution.length;
+  const isLargeGroup = participantCount > 5;
+
   return (
     <Box
       bg="white"
@@ -55,14 +90,15 @@ const BalanceCard = ({ chatData }) => {
       display="flex"
       flexDirection="column"
       boxShadow="2xl"
+      overflow="hidden"
     >
-      <VStack spacing={6} align="stretch" flex={1} justify="center">
+      <VStack spacing={4} align="stretch" flex={1} height="100%">
         <MotionBox
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Heading size="xl" textAlign="center" color="gray.800" mb={2}>
+          <Heading size="xl" textAlign="center" color="gray.800" mb={1}>
             Who Says What
           </Heading>
           <Text textAlign="center" color="gray.600" fontSize="lg">
@@ -70,7 +106,30 @@ const BalanceCard = ({ chatData }) => {
           </Text>
         </MotionBox>
 
-        <VStack spacing={6} align="stretch">
+        <VStack
+          spacing={isLargeGroup ? 4 : 5}
+          align="stretch"
+          flex={1}
+          overflowY="auto"
+          maxH={isLargeGroup ? "500px" : "none"}
+          pr={2}
+          css={{
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: '#f1f1f1',
+              borderRadius: '10px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: '#888',
+              borderRadius: '10px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              background: '#555',
+            },
+          }}
+        >
           {messageDistribution.map((person, idx) => {
             // Determine mood based on their contribution balance
             const senderData = stats.senderStats[person.sender];
@@ -82,14 +141,19 @@ const BalanceCard = ({ chatData }) => {
               key={person.sender}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 + idx * 0.2 }}
+              transition={{ delay: 0.2 + Math.min(idx * 0.1, 0.5) }}
             >
-              <HStack mb={3} justify="space-between">
-                <HStack spacing={3}>
+              <HStack mb={2} justify="space-between">
+                <HStack spacing={3} flex={1} minW={0}>
                   <ParticipantAvatar name={person.sender} size="sm" showName={false} mood={mood} />
-                  <VStack align="start" spacing={0}>
+                  <VStack align="start" spacing={0} flex={1} minW={0}>
                     <HStack spacing={2}>
-                      <Text fontWeight="bold" fontSize="lg" color="gray.800">
+                      <Text
+                        fontWeight="bold"
+                        fontSize={isLargeGroup ? "md" : "lg"}
+                        color="gray.800"
+                        noOfLines={1}
+                      >
                         {person.isYou ? 'You' : person.sender}
                       </Text>
                       {person.isYou && (
@@ -103,14 +167,14 @@ const BalanceCard = ({ chatData }) => {
                     </Text>
                   </VStack>
                 </HStack>
-                <Text fontSize="2xl" fontWeight="black" color="purple.600">
+                <Text fontSize={isLargeGroup ? "xl" : "2xl"} fontWeight="black" color="purple.600" flexShrink={0}>
                   {person.percentage}%
                 </Text>
               </HStack>
               <Progress
                 value={person.percentage}
                 colorScheme="purple"
-                size="lg"
+                size={isLargeGroup ? "md" : "lg"}
                 borderRadius="full"
                 bg="purple.100"
               />
@@ -128,8 +192,9 @@ const BalanceCard = ({ chatData }) => {
           borderRadius="xl"
           borderLeft="4px solid"
           borderColor="blue.500"
+          flexShrink={0}
         >
-          <Text color="gray.700" fontSize="md" lineHeight="tall">
+          <Text color="gray.700" fontSize={isLargeGroup ? "sm" : "md"} lineHeight="tall">
             <strong>Coach's note:</strong> {getBalanceInsight()}
           </Text>
         </MotionBox>

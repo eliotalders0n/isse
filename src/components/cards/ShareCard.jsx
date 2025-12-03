@@ -4,8 +4,15 @@ import { FiShare2, FiDownload, FiHeart } from 'react-icons/fi';
 
 const MotionBox = motion(Box);
 
-const ShareCard = ({ chatData }) => {
-  const { metadata } = chatData;
+const ShareCard = ({ chatData = {} }) => {
+  const {
+    metadata = {
+      participants: [],
+      totalMessages: 0,
+      startDate: new Date(),
+      endDate: new Date()
+    }
+  } = chatData;
 
   const handleShare = async () => {
     if (navigator.share) {

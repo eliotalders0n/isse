@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Box, HStack, IconButton } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
@@ -18,25 +18,62 @@ import ShareCard from './cards/ShareCard';
 const MotionBox = motion(Box);
 
 const SwipeableCardDashboard = ({ chatData }) => {
+  // `chatData` may be null while the app is transitioning between states.
+  // Use a safe default object so `shouldShow` checks and card components
+  // don't attempt to read properties from `null` and crash the app.
+  const safeChatData = useMemo(() => chatData || {}, [chatData]);
   const [currentCard, setCurrentCard] = useState(0);
   const [direction, setDirection] = useState(0);
 
-  const cards = [
-    { id: 'intro', component: IntroCard },
-    { id: 'stats', component: StatsCard },
-    { id: 'aboutyou', component: AboutYouCard },
-    { id: 'coaching', component: CoachingInsightsCard },
-    { id: 'aiinsights', component: AIInsightsCard },
-    { id: 'balance', component: BalanceCard },
-    { id: 'emotions', component: EmotionsCard },
-    { id: 'words', component: WordsCard },
-    { id: 'patterns', component: PatternsCard },
-    { id: 'health', component: HealthCard },
-    { id: 'milestones', component: MilestonesCard },
-    { id: 'share', component: ShareCard },
-  ];
+  // Define all possible cards with conditional rendering logic
+  const cards = useMemo(() => {
+    const allCards = [
+      { id: 'intro', component: IntroCard, alwaysShow: true },
+      { id: 'stats', component: StatsCard, alwaysShow: true },
+      {
+        id: 'aboutyou',
+        component: AboutYouCard,
+        shouldShow: () => safeChatData.personalizedInsights && safeChatData.personalizedSentiment
+      },
+      {
+        id: 'coaching',
+        component: CoachingInsightsCard,
+        shouldShow: () => safeChatData.coachingInsights && safeChatData.coachingInsights.length > 0
+      },
+      {
+        id: 'aiinsights',
+        component: AIInsightsCard,
+        shouldShow: () => safeChatData.sentiment?.aiPowered || safeChatData.sentiment?.aiInsights
+      },
+      { id: 'balance', component: BalanceCard, alwaysShow: true },
+      { id: 'emotions', component: EmotionsCard, alwaysShow: true },
+      { id: 'words', component: WordsCard, alwaysShow: true },
+      { id: 'patterns', component: PatternsCard, alwaysShow: true },
+      { id: 'health', component: HealthCard, alwaysShow: true },
+      {
+        id: 'milestones',
+        component: MilestonesCard,
+        shouldShow: () => safeChatData.gamification?.milestones && safeChatData.gamification.milestones.length > 0
+      },
+      { id: 'share', component: ShareCard, alwaysShow: true },
+    ];
+
+    // Filter cards based on available data
+    return allCards.filter(card => {
+      if (card.alwaysShow) return true;
+      if (card.shouldShow) return card.shouldShow();
+      return true;
+    });
+  }, [safeChatData]);
 
   const totalCards = cards.length;
+
+  // Ensure current card index is within bounds when cards change
+  useEffect(() => {
+    if (currentCard >= totalCards && totalCards > 0) {
+      setCurrentCard(totalCards - 1);
+    }
+  }, [totalCards, currentCard]);
 
   const swipeConfidenceThreshold = 10000;
   const swipePower = (offset, velocity) => {
@@ -142,7 +179,7 @@ const SwipeableCardDashboard = ({ chatData }) => {
             width="100%"
             height="100%"
           >
-            <CurrentCardComponent chatData={chatData} />
+            <CurrentCardComponent chatData={safeChatData} />
           </MotionBox>
         </AnimatePresence>
       </Box>
