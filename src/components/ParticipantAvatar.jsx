@@ -6,11 +6,11 @@ const MotionBox = motion(Box);
 // Generate a consistent color based on name
 const getAvatarColor = (name) => {
   const colors = [
-    { bg: 'warm.400', light: 'warm.100' },
-    { bg: 'peach.400', light: 'peach.100' },
-    { bg: 'rose.400', light: 'rose.100' },
-    { bg: 'orange.400', light: 'orange.100' },
-    { bg: 'pink.400', light: 'pink.100' },
+    { bg: 'accent.600', light: 'accent.50' },
+    { bg: 'accent.700', light: 'dark.50' },
+    { bg: 'dark.600', light: 'dark.100' },
+    { bg: 'accent.500', light: 'accent.100' },
+    { bg: 'dark.700', light: 'dark.50' },
   ];
 
   const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -137,7 +137,7 @@ const ParticipantAvatar = ({ name, size = 'lg', showName = true, variant = 'illu
         <Text
           fontSize={dimensions.text}
           fontWeight="bold"
-          color="sand.800"
+          color="dark.800"
           textAlign="center"
         >
           {name}

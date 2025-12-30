@@ -1,0 +1,64 @@
+[debug] [2025-12-30T12:41:49.296Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-30T12:41:49.303Z] > authorizing via signed-in user (eliot.alderson.pro@gmail.com)
+[debug] [2025-12-30T12:41:49.303Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-30T12:41:49.303Z] > authorizing via signed-in user (eliot.alderson.pro@gmail.com)
+[debug] [2025-12-30T12:41:49.304Z] Checked if tokens are valid: false, expires at: 1767098773819
+[debug] [2025-12-30T12:41:49.305Z] Checked if tokens are valid: false, expires at: 1767098773819
+[debug] [2025-12-30T12:41:49.305Z] > refreshing access token with scopes: []
+[debug] [2025-12-30T12:41:49.307Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-12-30T12:41:49.308Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-12-30T12:41:49.402Z] Checked if tokens are valid: false, expires at: 1767098773819
+[debug] [2025-12-30T12:41:49.402Z] Checked if tokens are valid: false, expires at: 1767098773819
+[debug] [2025-12-30T12:41:49.402Z] > refreshing access token with scopes: []
+[debug] [2025-12-30T12:41:49.403Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-12-30T12:41:49.403Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-12-30T12:41:49.405Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-30T12:41:49.406Z] > authorizing via signed-in user (eliot.alderson.pro@gmail.com)
+[debug] [2025-12-30T12:41:49.406Z] Checked if tokens are valid: false, expires at: 1767098773819
+[debug] [2025-12-30T12:41:49.406Z] Checked if tokens are valid: false, expires at: 1767098773819
+[debug] [2025-12-30T12:41:49.406Z] > refreshing access token with scopes: []
+[debug] [2025-12-30T12:41:49.406Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-12-30T12:41:49.406Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-12-30T12:41:53.308Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-12-30T12:41:53.308Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-12-30T12:41:53.346Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/babili-isse/billingInfo [none]
+[debug] [2025-12-30T12:41:53.349Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-12-30T12:41:53.349Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-12-30T12:41:53.412Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/babili-isse/billingInfo [none]
+[debug] [2025-12-30T12:41:53.415Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-12-30T12:41:53.415Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-12-30T12:41:53.449Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/babili-isse/billingInfo [none]
+[debug] [2025-12-30T12:41:58.968Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/babili-isse/billingInfo 403
+[debug] [2025-12-30T14:53:07.790Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-30T14:53:07.801Z] > authorizing via signed-in user (eliot.alderson.pro@gmail.com)
+[debug] [2025-12-30T14:53:07.802Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-30T14:53:07.804Z] > authorizing via signed-in user (eliot.alderson.pro@gmail.com)
+[debug] [2025-12-30T14:53:07.805Z] Checked if tokens are valid: false, expires at: 1767102112416
+[debug] [2025-12-30T14:53:07.806Z] Checked if tokens are valid: false, expires at: 1767102112416
+[debug] [2025-12-30T14:53:07.806Z] > refreshing access token with scopes: []
+[debug] [2025-12-30T14:53:07.809Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-12-30T14:53:07.809Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-12-30T14:53:07.858Z] Checked if tokens are valid: false, expires at: 1767102112416
+[debug] [2025-12-30T14:53:07.858Z] Checked if tokens are valid: false, expires at: 1767102112416
+[debug] [2025-12-30T14:53:07.858Z] > refreshing access token with scopes: []
+[debug] [2025-12-30T14:53:07.859Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-12-30T14:53:07.859Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-12-30T14:53:07.862Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-30T14:53:07.863Z] > authorizing via signed-in user (eliot.alderson.pro@gmail.com)
+[debug] [2025-12-30T14:53:07.864Z] Checked if tokens are valid: false, expires at: 1767102112416
+[debug] [2025-12-30T14:53:07.864Z] Checked if tokens are valid: false, expires at: 1767102112416
+[debug] [2025-12-30T14:53:07.864Z] > refreshing access token with scopes: []
+[debug] [2025-12-30T14:53:07.864Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-12-30T14:53:07.864Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-12-30T14:53:11.900Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-12-30T14:53:11.900Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-12-30T14:53:11.945Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/babili-isse/billingInfo [none]
+[debug] [2025-12-30T14:53:11.950Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-12-30T14:53:11.950Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-12-30T14:53:11.990Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/babili-isse/billingInfo [none]
+[debug] [2025-12-30T14:53:11.992Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-12-30T14:53:11.993Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-12-30T14:53:12.037Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/babili-isse/billingInfo [none]
+[debug] [2025-12-30T14:53:14.223Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/babili-isse/billingInfo 403
+[debug] [2025-12-30T14:53:14.223Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/babili-isse/billingInfo {"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}
+[debug] [2025-12-30T14:53:14.723Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/babili-isse/billingInfo 403

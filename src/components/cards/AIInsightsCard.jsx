@@ -40,11 +40,10 @@ const AIInsightsCard = ({ chatData = {} }) => {
                     textAlign="center"
                 >
                     <HStack justify="center" spacing={2} mb={2}>
-                        <Box as={FiCpu} size={28} color="purple.500" />
+                        <Box as={FiCpu} size={28} color="accent.600" />
                         <Heading
                             size="xl"
-                            bgGradient="linear(to-r, purple.500, pink.500)"
-                            bgClip="text"
+                            color="dark.900"
                             fontWeight="800"
                         >
                             AI Insights
@@ -53,7 +52,7 @@ const AIInsightsCard = ({ chatData = {} }) => {
                     <Badge colorScheme="purple" fontSize="sm" px={3} py={1} borderRadius="full">
                         Powered by Google Gemini
                     </Badge>
-                    <Text fontSize="md" color="gray.600" mt={2}>
+                    <Text fontSize="md" color="dark.600" mt={2}>
                         Deep analysis of your relationship dynamic
                     </Text>
                 </MotionBox>
@@ -66,8 +65,7 @@ const AIInsightsCard = ({ chatData = {} }) => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
-                        bg="gradient"
-                        bgGradient="linear(to-r, purple.500, pink.500)"
+                        bg="dark.900"
                         p={5}
                         borderRadius="xl"
                     >
@@ -89,19 +87,19 @@ const AIInsightsCard = ({ chatData = {} }) => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 }}
-                        bg="blue.50"
+                        bg="accent.50"
                         p={4}
                         borderRadius="xl"
                         borderLeft="4px solid"
-                        borderColor="blue.500"
+                        borderColor="accent.600"
                     >
                         <HStack spacing={2} mb={2}>
-                            <Box as={FiTarget} color="blue.600" size={20} />
-                            <Text fontWeight="bold" color="gray.800">
+                            <Box as={FiTarget} color="accent.600" size={20} />
+                            <Text fontWeight="bold" color="dark.800">
                                 Communication Style
                             </Text>
                         </HStack>
-                        <Text color="gray.700" fontSize="sm" lineHeight="tall">
+                        <Text color="dark.700" fontSize="sm" lineHeight="tall">
                             {sentiment.aiCommunicationStyle}
                         </Text>
                     </MotionBox>
@@ -113,19 +111,19 @@ const AIInsightsCard = ({ chatData = {} }) => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.4 }}
-                        bg="pink.50"
+                        bg="dark.50"
                         p={4}
                         borderRadius="xl"
                         borderLeft="4px solid"
-                        borderColor="pink.500"
+                        borderColor="accent.600"
                     >
                         <HStack spacing={2} mb={2}>
-                            <Box as={FiTrendingUp} color="pink.600" size={20} />
-                            <Text fontWeight="bold" color="gray.800">
+                            <Box as={FiTrendingUp} color="accent.600" size={20} />
+                            <Text fontWeight="bold" color="dark.800">
                                 Emotional Patterns
                             </Text>
                         </HStack>
-                        <Text color="gray.700" fontSize="sm" lineHeight="tall">
+                        <Text color="dark.700" fontSize="sm" lineHeight="tall">
                             {sentiment.aiEmotionalPatterns}
                         </Text>
                     </MotionBox>
@@ -137,16 +135,16 @@ const AIInsightsCard = ({ chatData = {} }) => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.5 }}
-                        bg="purple.50"
+                        bg="accent.50"
                         p={4}
                         borderRadius="xl"
                         borderLeft="4px solid"
-                        borderColor="purple.500"
+                        borderColor="accent.600"
                     >
-                        <Text fontWeight="bold" color="gray.800" mb={1}>
+                        <Text fontWeight="bold" color="dark.800" mb={1}>
                             Relationship Stage
                         </Text>
-                        <Text color="gray.700" fontSize="sm" lineHeight="tall">
+                        <Text color="dark.700" fontSize="sm" lineHeight="tall">
                             {sentiment.aiRelationshipStage}
                         </Text>
                     </MotionBox>
@@ -155,8 +153,8 @@ const AIInsightsCard = ({ chatData = {} }) => {
                 {/* Deep AI Insights */}
                 {sentiment.aiInsights && sentiment.aiInsights.length > 0 && (
                     <VStack spacing={3} align="stretch">
-                        <Text fontWeight="bold" color="gray.800" fontSize="lg">
-                            💡 Deep Insights
+                        <Text fontWeight="bold" color="dark.900" fontSize="lg">
+                            Deep Insights
                         </Text>
                         {sentiment.aiInsights.map((insight, idx) => (
                             <MotionBox
@@ -164,18 +162,17 @@ const AIInsightsCard = ({ chatData = {} }) => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.6 + idx * 0.1 }}
-                                bg="gradient"
-                                bgGradient="linear(to-br, gray.50, purple.50)"
+                                bg="dark.50"
                                 p={4}
                                 borderRadius="lg"
                                 borderLeft="3px solid"
-                                borderColor="purple.400"
+                                borderColor="accent.600"
                             >
                                 <HStack align="start" spacing={2}>
-                                    <Text color="purple.500" fontWeight="bold" fontSize="lg">
+                                    <Text color="accent.600" fontWeight="bold" fontSize="lg">
                                         •
                                     </Text>
-                                    <Text color="gray.700" fontSize="sm" lineHeight="tall" flex={1}>
+                                    <Text color="dark.700" fontSize="sm" lineHeight="tall" flex={1}>
                                         {insight}
                                     </Text>
                                 </HStack>
@@ -189,14 +186,14 @@ const AIInsightsCard = ({ chatData = {} }) => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1 }}
-                    bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                    bg="dark.900"
                     p={4}
                     borderRadius="lg"
                     textAlign="center"
                     mt="auto"
                 >
                     <Text fontSize="sm" color="white" fontWeight="medium">
-                        AI insights are generated based on conversation patterns and context 🤖✨
+                        AI insights are generated based on conversation patterns and context
                     </Text>
                 </MotionBox>
             </VStack>

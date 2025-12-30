@@ -7,19 +7,19 @@ const MotionCard = motion(Card);
 const CoachMessage = ({ message, type = 'insight', icon = FiHeart, delay = 0 }) => {
   const typeStyles = {
     insight: {
-      bg: 'linear-gradient(135deg, rgba(255, 133, 86, 0.1) 0%, rgba(251, 146, 60, 0.1) 100%)',
-      borderColor: 'warm.400',
-      iconColor: 'warm.500',
+      bg: 'accent.50',
+      borderColor: 'accent.600',
+      iconColor: 'accent.600',
     },
     encouragement: {
-      bg: 'linear-gradient(135deg, rgba(251, 146, 60, 0.1) 0%, rgba(251, 113, 133, 0.1) 100%)',
-      borderColor: 'peach.400',
-      iconColor: 'peach.500',
+      bg: 'accent.50',
+      borderColor: 'accent.600',
+      iconColor: 'accent.600',
     },
     observation: {
-      bg: 'linear-gradient(135deg, rgba(244, 63, 94, 0.1) 0%, rgba(255, 133, 86, 0.1) 100%)',
-      borderColor: 'rose.400',
-      iconColor: 'rose.500',
+      bg: 'accent.50',
+      borderColor: 'accent.600',
+      iconColor: 'accent.600',
     },
   };
 
@@ -47,7 +47,7 @@ const CoachMessage = ({ message, type = 'insight', icon = FiHeart, delay = 0 }) 
           />
           <Text
             fontSize={{ base: 'md', md: 'lg' }}
-            color="sand.700"
+            color="dark.700"
             lineHeight="tall"
             fontWeight="500"
           >

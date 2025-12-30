@@ -3,21 +3,26 @@ import {
   VStack,
   Heading,
   Text,
-  Card as ChakraCard,
-  CardBody,
-  Badge,
-  HStack,
-  Divider,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import {
-  FiHeart,
-  FiStar,
-  FiInfo,
-  FiCheckCircle,
-} from 'react-icons/fi';
 
-const MotionCard = motion(ChakraCard);
+const MotionBox = motion(Box);
+
+// Get gradient based on insight type
+const getGradientForType = (type) => {
+  switch (type) {
+    case 'positive':
+      return 'linear(to-r, green.400, teal.500)';
+    case 'suggestion':
+      return 'linear(to-r, purple.400, pink.500)';
+    case 'neutral':
+      return 'linear(to-r, blue.400, indigo.500)';
+    case 'growth':
+      return 'linear(to-r, orange.400, yellow.500)';
+    default:
+      return 'linear(to-r, purple.400, pink.400)';
+  }
+};
 
 const CoachingInsightsCard = ({ chatData = {} }) => {
   const { coachingInsights, selectedParticipant } = chatData;
@@ -40,115 +45,89 @@ const CoachingInsightsCard = ({ chatData = {} }) => {
     );
   }
 
-  const getIconForType = (type) => {
-    switch (type) {
-      case 'positive':
-        return FiHeart;
-      case 'suggestion':
-        return FiInfo;
-      case 'neutral':
-        return FiStar;
-      default:
-        return FiCheckCircle;
-    }
-  };
-
-  const getColorForType = (type) => {
-    switch (type) {
-      case 'positive':
-        return 'green';
-      case 'suggestion':
-        return 'orange';
-      case 'neutral':
-        return 'blue';
-      default:
-        return 'warm';
-    }
-  };
+  // Take up to 3 insights for cleaner display
+  const displayInsights = coachingInsights.slice(0, 3);
 
   return (
     <Box
       bg="white"
       borderRadius="3xl"
-      p={8}
+      p={{ base: 6, md: 8 }}
       height="100%"
       display="flex"
       flexDirection="column"
+      justifyContent="center"
       boxShadow="2xl"
     >
-      <VStack spacing={6} align="stretch" h="100%" overflowY="auto">
+      <VStack spacing={{ base: 8, md: 10 }} align="center" justify="center" flex={1}>
         {/* Header */}
-        <Box textAlign="center">
+        <MotionBox
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          textAlign="center"
+        >
           <Heading
-            size="xl"
-            bgGradient="linear(to-r, warm.500, peach.500)"
-            bgClip="text"
+            fontSize={{ base: "20px", md: "24px", lg: "28px" }}
+            color="dark.900"
             fontWeight="800"
             mb={2}
           >
-            Your Insights
+            Coaching for You
           </Heading>
-          <Text fontSize="md" color="sand.600">
-            Personalized coaching for you, {selectedParticipant}
+          <Text fontSize={{ base: "xs", sm: "sm" }} color="dark.500">
+            {selectedParticipant ? 'Personalized insights to help you grow' : 'Insights from your conversation'}
           </Text>
-        </Box>
+        </MotionBox>
 
-        <Divider />
-
-        {/* Coaching Insights */}
-        <VStack spacing={4} align="stretch" flex={1}>
-          {coachingInsights.map((insight, idx) => {
-            const Icon = getIconForType(insight.type);
-            const colorScheme = getColorForType(insight.type);
-
-            return (
-              <MotionCard
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1, duration: 0.4 }}
-                bg="white"
-                borderRadius="lg"
-                boxShadow="md"
-                borderLeft="4px solid"
-                borderColor={`${colorScheme}.400`}
-                whileHover={{ scale: 1.02, boxShadow: 'lg' }}
-              >
-                <CardBody p={4}>
-                  <VStack align="start" spacing={2}>
-                    <HStack spacing={2}>
-                      <Box as={Icon} size={18} color={`${colorScheme}.500`} />
-                      <Text
-                        fontSize="sm"
-                        fontWeight="bold"
-                        color={`${colorScheme}.600`}
-                        textTransform="uppercase"
-                        letterSpacing="wide"
-                      >
-                        {insight.title}
-                      </Text>
-                    </HStack>
-                    <Text fontSize="sm" color="sand.700" lineHeight="tall">
-                      {insight.message}
-                    </Text>
-                  </VStack>
-                </CardBody>
-              </MotionCard>
-            );
-          })}
+        {/* Insight Words Display */}
+        <VStack spacing={{ base: 6, md: 8 }} w="100%" maxW="500px">
+          {displayInsights.map((insight, idx) => (
+            <MotionBox
+              key={idx}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 + idx * 0.15, type: 'spring' }}
+              w="100%"
+            >
+              <VStack spacing={2}>
+                <Heading
+                  fontSize={{ base: "32px", sm: "40px", md: "48px", lg: "52px" }}
+                  fontWeight="black"
+                  bgGradient={getGradientForType(insight.type)}
+                  bgClip="text"
+                  letterSpacing="tight"
+                  lineHeight="1"
+                  textAlign="center"
+                >
+                  {insight.title}
+                </Heading>
+                <Text
+                  fontSize={{ base: "sm", md: "md" }}
+                  color="dark.700"
+                  textAlign="center"
+                  maxW={{ base: "280px", md: "350px" }}
+                  lineHeight="tall"
+                  fontWeight="600"
+                >
+                  {insight.message}
+                </Text>
+              </VStack>
+            </MotionBox>
+          ))}
         </VStack>
 
-        {/* Bottom Message */}
-        <Box
-          bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-          p={4}
-          borderRadius="lg"
+        {/* Bottom text */}
+        <MotionBox
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
           textAlign="center"
         >
-          <Text fontSize="sm" color="white" fontWeight="medium">
-            Every conversation is a chance to grow. Keep being you! 💜
+          <Text fontSize={{ base: "xs", sm: "sm" }} color="dark.500" maxW="280px">
+            Every conversation is a chance to grow
           </Text>
-        </Box>
+        </MotionBox>
       </VStack>
     </Box>
   );

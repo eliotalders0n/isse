@@ -101,7 +101,8 @@ export const getPersonalizedInsights = (messages, userName) => {
 
 /**
  * Get personalized sentiment insights for a specific user
- * @param {Array} messages - Array of messages with sentiment
+ * Maps romantic relationship intents to sentiment
+ * @param {Array} messages - Array of messages with lexical analysis
  * @param {string} userName - Name of the user to analyze
  * @returns {Object} Sentiment breakdown for the user
  */
@@ -110,38 +111,60 @@ export const getPersonalizedSentiment = (messages, userName) => {
 
   if (userMessages.length === 0) return null;
 
-  const sentimentCounts = {
-    positive: 0,
-    neutral: 0,
-    negative: 0,
-  };
+  let positiveScore = 0;
+  let negativeScore = 0;
+  let neutralScore = 0;
 
   const emotionCounts = {};
 
   userMessages.forEach(m => {
-    if (m.sentiment) {
-      sentimentCounts[m.sentiment.sentiment]++;
+    // Map romantic relationship intents to sentiment
+    // POSITIVE: affection, commitment, reconciliation, passion
+    // NEGATIVE: conflict, drama, uncertainty
+    // NEUTRAL: urgency
+    if (m.lexical && m.lexical.intents) {
+      const intents = m.lexical.intents;
 
-      if (m.sentiment.detectedEmotions && m.sentiment.detectedEmotions.length > 0) {
-        m.sentiment.detectedEmotions.forEach(emotion => {
-          emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
-        });
+      positiveScore += (intents.affection || 0) + (intents.commitment || 0) +
+                       (intents.reconciliation || 0) + (intents.passion || 0);
+      negativeScore += (intents.conflict || 0) + (intents.drama || 0) +
+                       (intents.uncertainty || 0);
+      neutralScore += (intents.urgency || 0);
+
+      // Map dominant intent to emotion
+      const dominantIntent = intents.dominantIntent;
+      if (dominantIntent) {
+        const emotionMap = {
+          affection: 'love',
+          passion: 'desire',
+          commitment: 'trust',
+          reconciliation: 'forgiveness',
+          conflict: 'anger',
+          drama: 'jealousy',
+          uncertainty: 'insecurity',
+          urgency: 'anxious',
+        };
+        const emotion = emotionMap[dominantIntent] || 'neutral';
+        emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
       }
     }
   });
 
-  const total = userMessages.length;
+  const total = positiveScore + negativeScore + neutralScore || 1;
+  const positivePercent = Math.round((positiveScore / total) * 100);
+  const negativePercent = Math.round((negativeScore / total) * 100);
+  const neutralPercent = Math.round((neutralScore / total) * 100);
 
   return {
-    positivePercent: Math.round((sentimentCounts.positive / total) * 100),
-    neutralPercent: Math.round((sentimentCounts.neutral / total) * 100),
-    negativePercent: Math.round((sentimentCounts.negative / total) * 100),
+    positivePercent: isNaN(positivePercent) ? 0 : positivePercent,
+    neutralPercent: isNaN(neutralPercent) ? 0 : neutralPercent,
+    negativePercent: isNaN(negativePercent) ? 0 : negativePercent,
     topEmotions: Object.entries(emotionCounts)
       .map(([emotion, count]) => ({ emotion, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 3),
-    overallMood: sentimentCounts.positive > sentimentCounts.negative ? 'Positive' :
-                 sentimentCounts.positive < sentimentCounts.negative ? 'Thoughtful' : 'Balanced',
+    overallMood: positivePercent > negativePercent ? 'Loving' :
+                 negativePercent > positivePercent ? 'Complex' : 'Balanced',
   };
 };
 

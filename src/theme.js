@@ -1,55 +1,85 @@
 import { extendTheme } from '@chakra-ui/react';
 
-// Warm relationship coach color palette
+// Duo-tone black & white with dark purple accents
 const theme = extendTheme({
   colors: {
+    dark: {
+      50: '#F5F5F5',   // Very light gray (for subtle backgrounds on white)
+      100: '#E0E0E0',  // Light gray
+      200: '#BDBDBD',  // Medium-light gray
+      300: '#9E9E9E',  // Medium gray
+      400: '#757575',  // Medium-dark gray
+      500: '#616161',  // Dark gray
+      600: '#424242',  // Darker gray
+      700: '#303030',  // Very dark gray
+      800: '#1A1A1A',  // Near black
+      900: '#0A0A0A',  // Background near-black
+    },
+    accent: {
+      50: '#F5F3FF',   // Very light purple (for subtle backgrounds)
+      100: '#EDE9FE',  // Light purple
+      200: '#DDD6FE',  // Medium-light purple
+      300: '#C4B5FD',  // Medium purple
+      400: '#A78BFA',  // Medium-bright purple
+      500: '#8B5CF6',  // Bright purple
+      600: '#5B21B6',  // Deep purple (primary accent)
+      700: '#4C1D95',  // Darker purple
+      800: '#3B1A75',  // Very dark purple
+      900: '#2E1065',  // Deepest purple
+    },
+    light: {
+      50: '#FFFFFF',   // Pure white (card backgrounds)
+      100: '#FAFAFA',  // Off-white
+      200: '#F5F5F5',  // Very light gray
+    },
+    // Legacy aliases for backwards compatibility (mapped to new colors)
     warm: {
-      50: '#FFF5F0',
-      100: '#FFE8DB',
-      200: '#FFD4BB',
-      300: '#FFBC96',
-      400: '#FFA071',
-      500: '#FF8556',  // Primary warm coral
-      600: '#F86D42',
-      700: '#E55533',
-      800: '#C9432A',
-      900: '#A63522',
+      50: '#F5F3FF',
+      100: '#EDE9FE',
+      200: '#DDD6FE',
+      300: '#C4B5FD',
+      400: '#A78BFA',
+      500: '#8B5CF6',
+      600: '#5B21B6',  // Maps to accent
+      700: '#4C1D95',
+      800: '#3B1A75',
+      900: '#2E1065',
     },
     peach: {
-      50: '#FFF7ED',
-      100: '#FFEDD5',
-      200: '#FED7AA',
-      300: '#FDBA74',
-      400: '#FB923C',
-      500: '#F97316',  // Warm orange
-      600: '#EA580C',
-      700: '#C2410C',
-      800: '#9A3412',
-      900: '#7C2D12',
+      50: '#F5F3FF',
+      100: '#EDE9FE',
+      200: '#DDD6FE',
+      300: '#C4B5FD',
+      400: '#A78BFA',
+      500: '#8B5CF6',
+      600: '#5B21B6',  // Maps to accent
+      700: '#4C1D95',
+      800: '#3B1A75',
+      900: '#2E1065',
     },
     rose: {
-      50: '#FFF1F2',
-      100: '#FFE4E6',
-      200: '#FECDD3',
-      300: '#FDA4AF',
-      400: '#FB7185',
-      500: '#F43F5E',  // Warm pink
-      600: '#E11D48',
-      700: '#BE123C',
-      800: '#9F1239',
-      900: '#881337',
+      50: '#F5F3FF',
+      100: '#EDE9FE',
+      200: '#DDD6FE',
+      300: '#C4B5FD',
+      400: '#A78BFA',
+      500: '#8B5CF6',
+      600: '#5B21B6',  // Maps to accent
+      700: '#4C1D95',
+      800: '#3B1A75',
+      900: '#2E1065',
     },
     sand: {
-      50: '#FAFAF9',
-      100: '#F5F5F4',
-      200: '#E7E5E4',
-      300: '#D6D3D1',
-      400: '#A8A29E',
-      500: '#78716C',
-      600: '#57534E',
-      700: '#44403C',
-      800: '#292524',
-      900: '#1C1917',
+      50: '#F5F5F5',
+      100: '#E0E0E0',
+      200: '#BDBDBD',
+      300: '#9E9E9E',
+      400: '#757575',
+      500: '#616161',
+      600: '#424242',
+      700: '#303030',
+      800: '#1A1A1A',
+      900: '#0A0A0A',  // Maps to dark
     },
   },
   fonts: {
@@ -59,8 +89,8 @@ const theme = extendTheme({
   styles: {
     global: {
       body: {
-        bg: 'warm.50',
-        color: 'sand.800',
+        bg: 'dark.900',
+        color: 'white',
       },
     },
   },
@@ -72,20 +102,20 @@ const theme = extendTheme({
       },
       variants: {
         solid: {
-          bg: 'warm.500',
+          bg: 'accent.600',
           color: 'white',
           _hover: {
-            bg: 'warm.600',
+            bg: 'accent.700',
             transform: 'translateY(-2px)',
             boxShadow: 'lg',
           },
           _active: {
-            bg: 'warm.700',
+            bg: 'accent.800',
           },
         },
       },
       defaultProps: {
-        colorScheme: 'warm',
+        colorScheme: 'purple',
       },
     },
     Card: {
@@ -93,6 +123,8 @@ const theme = extendTheme({
         container: {
           borderRadius: '2xl',
           overflow: 'hidden',
+          bg: 'white',
+          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
         },
       },
     },

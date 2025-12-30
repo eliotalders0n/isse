@@ -215,19 +215,19 @@ const FileUpload = ({ onFileProcessed }) => {
     <MotionBox
       borderWidth={3}
       borderStyle="dashed"
-      borderColor="purple.300"
+      borderColor="dark.300"
       borderRadius="2xl"
       p={{ base: 8, md: 12 }}
       textAlign="center"
-      bg="purple.50"
+      bg="white"
       cursor="pointer"
       onClick={() => !isProcessing && fileInputRef.current?.click()}
       position="relative"
       overflow="hidden"
       whileHover={{
         scale: 1.02,
-        borderColor: '#880dfbff',
-        boxShadow: '0 20px 60px -15px rgba(118, 62, 164, 0.4)',
+        borderColor: '#5B21B6',
+        boxShadow: '0 20px 60px -15px rgba(91, 33, 182, 0.4)',
       }}
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.3 }}
@@ -246,7 +246,7 @@ const FileUpload = ({ onFileProcessed }) => {
         <MotionIcon
           as={FiUpload}
           boxSize={{ base: 12, md: 16 }}
-          color="purple.500"
+          color="accent.600"
           animate={{
             y: [0, -10, 0],
           }}
@@ -259,33 +259,33 @@ const FileUpload = ({ onFileProcessed }) => {
 
         {isProcessing ? (
           <>
-            <Text fontSize={{ base: "md", md: "lg" }} fontWeight="semibold" color="sand.800">
+            <Text fontSize={{ base: "md", md: "lg" }} fontWeight="semibold" color="dark.900">
               Analyzing {fileName}...
             </Text>
             <Progress
               value={progress}
               width="100%"
               maxW="400px"
-              colorScheme="warm"
+              colorScheme="purple"
               borderRadius="full"
               hasStripe
               isAnimated
               size="lg"
             />
-            <Text fontSize={{ base: "sm", md: "md" }} color="sand.600">
+            <Text fontSize={{ base: "sm", md: "md" }} color="dark.600">
               Preparing your relationship insights
             </Text>
           </>
         ) : (
           <>
-            <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" color="sand.800">
+            <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" color="dark.900">
               Let's Begin
             </Text>
-            <Text fontSize={{ base: "md", md: "lg" }} color="sand.600" maxW="400px">
+            <Text fontSize={{ base: "md", md: "lg" }} color="dark.600" maxW="400px">
               Upload your WhatsApp chat export to discover the story of your relationship
             </Text>
             <MotionButton
-              bg="purple.500"
+              bg="accent.600"
               color="white"
               size={{ base: "lg", md: "lg" }}
               leftIcon={<FiUpload />}
@@ -293,9 +293,9 @@ const FileUpload = ({ onFileProcessed }) => {
                 e.stopPropagation();
                 fileInputRef.current?.click();
               }}
-              whileHover={{ scale: 1.05, boxShadow: '0 10px 30px -10px rgba(114, 26, 254, 0.6)' }}
+              whileHover={{ scale: 1.05, boxShadow: '0 10px 30px -10px rgba(91, 33, 182, 0.6)' }}
               whileTap={{ scale: 0.95 }}
-              _hover={{ bg: 'purple.600' }}
+              _hover={{ bg: 'accent.700' }}
               px={8}
               py={6}
               fontSize={{ base: 'md', md: 'lg' }}
@@ -303,7 +303,7 @@ const FileUpload = ({ onFileProcessed }) => {
             >
               Choose Your Chat File
             </MotionButton>
-            <Text fontSize={{ base: "xs", md: "sm" }} color="sand.500" mt={{ base: 2, md: 3 }}>
+            <Text fontSize={{ base: "xs", md: "sm" }} color="dark.500" mt={{ base: 2, md: 3 }}>
               Need help? Export your chat as a .txt, .json, .pdf, or .zip file
             </Text>
           </>

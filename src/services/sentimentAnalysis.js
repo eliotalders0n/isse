@@ -2,8 +2,8 @@
  * Advanced Sentiment Analysis Service
  * Deep contextual analysis for multiple domains:
  * - Business & Corporate
- * - Personal Relationships (Love, Friends, Family)
- * - Professional Projects
+ * - Team, Client, and Peer Communication
+ * - Project Collaboration
  * - Emotional Intelligence
  *
  * Integrates with Google Gemini AI for enhanced analysis
@@ -122,7 +122,7 @@ const detectZambianLanguage = (messages) => {
 };
 
 /**
- * Detect conversation context (business, love, friendship, etc.)
+ * Detect conversation context (business, project, personal, etc.)
  * @param {Array} messages - Array of messages
  * @returns {Object} Context scores and primary context
  */
@@ -359,7 +359,8 @@ export const analyzeSentiment = (text) => {
  */
 export const analyzeWithGemini = async (text) => {
   try {
-    const prompt = `Analyze the sentiment and emotion in this message. Respond with ONLY valid JSON (no markdown, no code blocks, no extra text):
+    const prompt = `Analyze the sentiment and emotion in this message. Respond with ONLY valid JSON (no markdown, no code blocks, no extra text).
+Use professional, workplace-appropriate framing in aiInsight and context selection.
 
 Message: "${text}"
 
@@ -372,7 +373,7 @@ Return this exact JSON structure:
   "intensity": 0.75,
   "context": "business|professional|project|love|friendship|family|technical|personal",
   "communicationStyle": "assertive|passiveAggressive|defensive|supportive|questioning|planning|agreeing|disagreeing",
-  "aiInsight": "Brief insight about the message"
+  "aiInsight": "Brief workplace-appropriate insight about the message"
 }`;
 
     const result = await model.generateContent(prompt);
@@ -535,9 +536,9 @@ ${sampledMessages}
 
 Stats: ${messages.length} messages over ${stats.totalDays} days (${stats.avgMessagesPerDay}/day avg)
 
-Provide deep insights. Return ONLY valid JSON:
+Provide deep insights using professional, workplace-appropriate language. Return ONLY valid JSON:
 {
-  "overallDynamic": "Brief description of relationship dynamic",
+  "overallDynamic": "Brief description of collaboration dynamic",
   "conversationContext": "business|professional|project|love|friendship|family|technical|personal",
   "communicationHealth": "excellent|healthy|moderate|needs attention",
   "healthScore": 75,
@@ -545,7 +546,7 @@ Provide deep insights. Return ONLY valid JSON:
   "areasForGrowth": ["area1", "area2"],
   "emotionalPatterns": "Description of emotional patterns",
   "communicationStyle": "Description of dominant communication style",
-  "relationshipStage": "Description of relationship stage/maturity",
+  "relationshipStage": "Description of collaboration stage/maturity",
   "aiInsights": ["Deep insight 1", "Deep insight 2", "Deep insight 3"]
 }`;
 
@@ -623,11 +624,11 @@ export const isGroupChat = (participants) => {
 };
 
 /**
- * Analyze relationship dynamics and communication health
+ * Analyze collaboration dynamics and communication health
  * Supports both 1-on-1 conversations and group chats
  * @param {Array} messages - Array of messages with sentiment
  * @param {Array} participants - Participant names
- * @returns {Object} Relationship dynamics analysis
+ * @returns {Object} Collaboration dynamics analysis
  */
 export const analyzeRelationshipDynamics = (messages, participants) => {
   if (!messages || messages.length === 0 || !participants || participants.length < 2) {
@@ -711,11 +712,11 @@ export const analyzeRelationshipDynamics = (messages, participants) => {
         const p1Messages = messagesBySender[p1]?.length || 1;
         const p2Messages = messagesBySender[p2]?.length || 1;
 
-        allEmotions.forEach(emotion => {
+        for (const emotion of allEmotions) {
           const p1Ratio = (emotionsBySender[p1]?.[emotion] || 0) / p1Messages;
           const p2Ratio = (emotionsBySender[p2]?.[emotion] || 0) / p2Messages;
           reciprocityScore += Math.abs(p1Ratio - p2Ratio);
-        });
+        }
         pairCount++;
       }
     }
@@ -726,11 +727,11 @@ export const analyzeRelationshipDynamics = (messages, participants) => {
     const p1Messages = messagesBySender[person1]?.length || 1;
     const p2Messages = messagesBySender[person2]?.length || 1;
 
-    allEmotions.forEach(emotion => {
+    for (const emotion of allEmotions) {
       const p1Ratio = (emotionsBySender[person1]?.[emotion] || 0) / p1Messages;
       const p2Ratio = (emotionsBySender[person2]?.[emotion] || 0) / p2Messages;
       reciprocityScore += Math.abs(p1Ratio - p2Ratio);
-    });
+    }
     reciprocityScore = reciprocityScore / allEmotions.size;
   }
 
@@ -846,14 +847,14 @@ export const getSentimentTimeline = (messages, period = 'day') => {
 };
 
 /**
- * Generate comprehensive relationship summary with context awareness
+ * Generate comprehensive collaboration summary with context awareness
  * @param {Array} messages - Array of messages (should already have sentiment analysis)
  * @param {Object} stats - Chat statistics
  * @param {boolean} useAI - Whether to use Gemini AI for enhanced conversation-level insights
- * @returns {Object|Promise<Object>} Comprehensive relationship summary
+ * @returns {Object|Promise<Object>} Comprehensive collaboration summary
  */
 export const generateRelationshipSummary = async (messages, stats, useAI = false) => {
-  console.log('💭 Generating relationship summary...');
+  console.log('💭 Generating collaboration summary...');
 
   // Get AI-powered conversation insights if requested (1 API call only)
   let aiInsights = null;
@@ -878,7 +879,7 @@ export const generateRelationshipSummary = async (messages, stats, useAI = false
   // Detect conversation context
   const conversationContext = detectConversationContext(messages);
 
-  // Analyze relationship dynamics
+  // Analyze collaboration dynamics
   const participants = stats.senderStats ? Object.keys(stats.senderStats) : [];
   const relationshipDynamics = analyzeRelationshipDynamics(sentimentData, participants);
 
@@ -886,8 +887,15 @@ export const generateRelationshipSummary = async (messages, stats, useAI = false
   const totalNegative = timeline.reduce((sum, t) => sum + (t.negativeRatio * t.messageCount / 100), 0);
   const totalMessages = messages.length;
 
-  const overallPositivePercent = Math.round((totalPositive / totalMessages) * 100);
-  const overallNegativePercent = Math.round((totalNegative / totalMessages) * 100);
+  // Safe percentage calculation to avoid NaN
+  const safePercent = (value, total) => {
+    if (!total || total === 0 || isNaN(value) || isNaN(total)) return 0;
+    const percent = Math.round((value / total) * 100);
+    return isNaN(percent) ? 0 : Math.max(0, Math.min(100, percent));
+  };
+
+  const overallPositivePercent = safePercent(totalPositive, totalMessages);
+  const overallNegativePercent = safePercent(totalNegative, totalMessages);
 
   const mostPositivePeriod = [...timeline].sort((a, b) => b.positiveRatio - a.positiveRatio)[0];
   const mostNegativePeriod = [...timeline].sort((a, b) => b.negativeRatio - a.negativeRatio)[0];
@@ -923,11 +931,14 @@ export const generateRelationshipSummary = async (messages, stats, useAI = false
   // Enhanced communication health assessment
   let communicationHealth = 'healthy';
   let healthScore =
-    (relationshipDynamics.trustLevel * 0.3) +
-    (relationshipDynamics.supportLevel * 0.2) +
-    (relationshipDynamics.emotionalReciprocity * 0.2) +
-    ((100 - relationshipDynamics.conflictLevel) * 0.2) +
-    (overallPositivePercent * 0.1);
+    ((relationshipDynamics.trustLevel || 0) * 0.3) +
+    ((relationshipDynamics.supportLevel || 0) * 0.2) +
+    ((relationshipDynamics.emotionalReciprocity || 0) * 0.2) +
+    ((100 - (relationshipDynamics.conflictLevel || 0)) * 0.2) +
+    ((overallPositivePercent || 0) * 0.1);
+
+  // Ensure healthScore is a valid number
+  healthScore = isNaN(healthScore) ? 0 : healthScore;
 
   if (healthScore >= 70) {
     communicationHealth = 'excellent';
@@ -940,7 +951,7 @@ export const generateRelationshipSummary = async (messages, stats, useAI = false
   }
 
   const emotionBreakdown = getEmotionBreakdown(sentimentData);
-  const neutralPercent = Math.round(100 - overallPositivePercent - overallNegativePercent);
+  const neutralPercent = Math.max(0, Math.round(100 - overallPositivePercent - overallNegativePercent));
 
   // Override values with AI insights if available
   if (aiInsights) {
@@ -953,9 +964,9 @@ export const generateRelationshipSummary = async (messages, stats, useAI = false
   return {
     overallSentiment: overallPositivePercent > overallNegativePercent ? 'positive' :
                       overallNegativePercent > overallPositivePercent ? 'negative' : 'neutral',
-    positivePercent: overallPositivePercent,
-    negativePercent: overallNegativePercent,
-    neutralPercent: neutralPercent < 0 ? 0 : neutralPercent,
+    positivePercent: isNaN(overallPositivePercent) ? 0 : overallPositivePercent,
+    negativePercent: isNaN(overallNegativePercent) ? 0 : overallNegativePercent,
+    neutralPercent: isNaN(neutralPercent) || neutralPercent < 0 ? 0 : neutralPercent,
     mostPositivePeriod: mostPositivePeriod?.date,
     mostNegativePeriod: mostNegativePeriod?.date,
     topEmotions,
@@ -1011,11 +1022,11 @@ const generateInsights = (data) => {
   if (isGroup) {
     // Participation balance insights
     if (dynamics.communicationBalance >= 70) {
-      insights.push('⚖️ Excellent group balance - everyone contributes fairly equally!');
+      insights.push('Excellent team balance - everyone contributes fairly equally!');
     } else if (dynamics.communicationBalance >= 50) {
-      insights.push('👥 Moderate balance - most members are actively participating.');
+      insights.push('Moderate team balance - most members are actively participating.');
     } else if (dynamics.communicationBalance < 30) {
-      insights.push('📊 Participation imbalance - some members are much more active than others.');
+      insights.push('Participation imbalance - some members are much more active than others.');
     }
 
     // Most active participant insights
@@ -1029,36 +1040,36 @@ const generateInsights = (data) => {
       const activePercent = Math.round((mostActiveCount / totalMessages) * 100);
 
       if (activePercent > 50) {
-        insights.push(`💬 ${mostActive} dominates the conversation with ${activePercent}% of messages.`);
+        insights.push(`${mostActive} dominates the conversation with ${activePercent}% of messages.`);
       } else if (activePercent < 20 && sortedParticipants.length >= 4) {
-        insights.push(`🌟 Well-distributed conversation - no single person dominates!`);
+        insights.push(`Well-distributed conversation - no single person dominates!`);
       }
     }
 
     // Group cohesion insights
     if (dynamics.emotionalReciprocity > 70) {
-      insights.push('💞 Strong group cohesion - members share similar emotional patterns.');
+      insights.push('Strong team cohesion - members share similar emotional patterns.');
     } else if (dynamics.emotionalReciprocity < 40) {
-      insights.push('🎭 Diverse emotional expressions - each member brings unique energy.');
+      insights.push('Diverse perspectives - each member brings unique energy.');
     }
 
     // Group support level
     if (dynamics.supportLevel > 60) {
-      insights.push('🤝 Highly supportive group culture - members lift each other up.');
+      insights.push('Highly supportive team culture - members lift each other up.');
     }
 
     // Group conflict insights
     if (dynamics.conflictLevel > 25) {
-      insights.push('⚡ Notable group tension - may benefit from team building or conflict resolution.');
+      insights.push('Notable team tension - may benefit from alignment or conflict resolution.');
     } else if (dynamics.conflictLevel < 10) {
-      insights.push('☮️ Harmonious group dynamic with minimal conflict.');
+      insights.push('Harmonious team dynamic with minimal conflict.');
     }
 
     // Size-specific insights
     if (dynamics.participantCount >= 5) {
-      insights.push(`👥 Large group of ${dynamics.participantCount} members - impressive coordination!`);
+      insights.push(`Large team of ${dynamics.participantCount} members - impressive coordination!`);
     } else if (dynamics.participantCount === 3) {
-      insights.push('🔺 Trio dynamic - three-way conversations can be especially engaging!');
+      insights.push('Trio dynamic - small team coordination can be especially effective!');
     }
   }
 
@@ -1069,152 +1080,152 @@ const generateInsights = (data) => {
   if (context === 'business' || context === 'professional') {
     // Business/Professional insights
     if (data.overallPositivePercent > 60) {
-      insights.push('💼 Your professional relationship shows strong positive collaboration.');
+      insights.push('Your professional collaboration shows strong positive momentum.');
     }
     if (data.topEmotions.includes('pride') || data.topEmotions.includes('excitement')) {
-      insights.push('🎯 There\'s shared enthusiasm around achievements and goals.');
+      insights.push('There\'s shared enthusiasm around achievements and goals.');
     }
     if (dynamics.supportLevel > 60) {
-      insights.push('🤝 Strong mutual support is evident in your professional communication.');
+      insights.push('Strong mutual support is evident in your professional communication.');
     }
     if (data.topEmotions.includes('anxiety') && data.avgMessagesPerDay > 20) {
-      insights.push('⚠️ High message frequency with anxiety may indicate work stress or deadline pressure.');
+      insights.push('High message frequency with anxiety may indicate work stress or deadline pressure.');
     }
   } else if (context === 'project') {
     // Project-specific insights
     if (data.dominantCommunicationPattern === 'planning') {
-      insights.push('📋 Your conversations are highly focused on planning and coordination.');
+      insights.push('Your conversations are highly focused on planning and coordination.');
     }
     if (data.topEmotions.includes('excitement') && data.topEmotions.includes('anxiety')) {
-      insights.push('🚀 Mixed emotions of excitement and anxiety suggest an ambitious project with challenges.');
+      insights.push('Mixed emotions of excitement and anxiety suggest an ambitious project with challenges.');
     }
     if (dynamics.communicationBalance >= 40 && dynamics.communicationBalance <= 60) {
-      insights.push('⚖️ Excellent balance in project contributions from both sides.');
+      insights.push('Excellent balance in project contributions from both sides.');
     }
   } else if (context === 'love') {
-    // Romantic relationship insights
+    // High-rapport insights (kept professional in tone)
     if (data.topEmotions.includes('affection') && data.overallPositivePercent > 70) {
       insights.push(isZambian
-        ? '💕 Strong affectionate bond - your love language shines through clearly.'
-        : '💕 Strong affectionate bond with predominantly positive communication.');
+        ? 'Strong rapport and appreciation - your positive tone comes through clearly.'
+        : 'Strong rapport with predominantly positive communication.');
     }
     if (dynamics.emotionalReciprocity > 70) {
       insights.push(isZambian
-        ? '💝 High emotional connection - you understand each other deeply (tili pamodzi).'
-        : '💝 High emotional reciprocity - you mirror each other\'s feelings beautifully.');
+        ? 'High emotional alignment - you understand each other well.'
+        : 'High emotional alignment - you mirror each other\'s signals effectively.');
     }
     if (dynamics.trustLevel > 75) {
-      insights.push('🔐 Deep trust foundation evident in your conversations.');
+      insights.push('Deep trust foundation evident in your conversations.');
     }
     if (data.topEmotions.includes('betrayal') || data.topEmotions.includes('shame')) {
-      insights.push('💔 Some conversations show signs of hurt or betrayal that may need healing.');
+      insights.push('Some conversations show signs of strained trust that may need repair.');
     }
     if (dynamics.conflictLevel < 10 && data.avgMessagesPerDay > 20) {
-      insights.push('✨ Healthy, active relationship with minimal conflict.');
+      insights.push('Healthy, active collaboration with minimal conflict.');
     }
-    // Zambian-specific romantic insight
+    // Zambian-specific rapport insight
     if (isZambian) {
       if (data.avgMessagesPerDay > 15) {
-        insights.push('📱 You stay connected throughout the day - real commitment showing.');
+        insights.push('You stay connected throughout the day - strong commitment to alignment.');
       }
     }
   } else if (context === 'friendship') {
-    // Friendship insights
+    // Peer rapport insights
     if (data.topEmotions.includes('joy') && data.topEmotions.includes('excitement')) {
-      insights.push('🎉 Your friendship is filled with joy and shared excitement.');
+      insights.push('Your peer rapport is filled with positive energy and shared excitement.');
     }
     if (dynamics.supportLevel > 65) {
-      insights.push('🫂 Strong supportive friendship with mutual care.');
+      insights.push('Strong peer support with mutual care.');
     }
     if (data.avgMessagesPerDay < 3 && data.overallPositivePercent > 70) {
-      insights.push('🌟 Quality over quantity - meaningful exchanges despite lower frequency.');
+      insights.push('Quality over quantity - meaningful exchanges despite lower frequency.');
     }
   } else if (context === 'family') {
-    // Family insights
+    // Long-standing rapport insights
     if (data.topEmotions.includes('gratitude') || data.topEmotions.includes('affection')) {
       insights.push(isZambian
-        ? '👨‍👩‍👧‍👦 Family bond showing care and respect - family values are strong here.'
-        : '👨‍👩‍👧‍👦 Family bond showing appreciation and care.');
+        ? 'Strong rapport showing care and respect.'
+        : 'Long-standing rapport showing appreciation and care.');
     }
     if (dynamics.conflictLevel > 25) {
-      insights.push('⚠️ Some family tension present - open communication may help.');
+      insights.push('Some tension present - open communication may help.');
     }
-    // Zambian family context
+    // Zambian rapport context
     if (isZambian) {
       if (dynamics.supportLevel > 60) {
-        insights.push('🏡 Strong family support system - taking care of each other.');
+        insights.push('Strong support system - people are looking out for each other.');
       }
     }
   } else if (context === 'technical') {
     // Technical/Development insights
     if (data.topEmotions.includes('excitement') && data.topEmotions.includes('pride')) {
-      insights.push('💻 Enthusiastic technical collaboration with shared accomplishments.');
+      insights.push('Enthusiastic technical collaboration with shared accomplishments.');
     }
     if (data.topEmotions.includes('anxiety') && data.avgMessagesPerDay > 30) {
-      insights.push('🐛 High-intensity technical work - possible debugging or critical issue resolution.');
+      insights.push('High-intensity technical work - possible debugging or critical issue resolution.');
     }
     if (dynamics.supportLevel > 60) {
-      insights.push('👨‍💻 Strong collaborative coding culture with peer support.');
+      insights.push('Strong collaborative coding culture with peer support.');
     }
     if (data.dominantCommunicationPattern === 'questioning' && data.overallPositivePercent > 60) {
-      insights.push('❓ Healthy technical curiosity and knowledge sharing.');
+      insights.push('Healthy technical curiosity and knowledge sharing.');
     }
     if (data.topEmotions.includes('frustration') || data.topEmotions.includes('anger')) {
-      insights.push('⚡ Technical frustration present - complex bugs or architectural challenges.');
+      insights.push('Technical frustration present - complex bugs or architectural challenges.');
     }
     if (dynamics.emotionalReciprocity > 70 && dynamics.communicationBalance >= 40 && dynamics.communicationBalance <= 60) {
-      insights.push('🤝 Excellent pair programming or collaboration dynamic.');
+      insights.push('Excellent pair programming or collaboration dynamic.');
     }
   }
 
   // General sentiment insights
   if (data.overallPositivePercent > 70) {
-    insights.push('😊 Overwhelmingly positive communication tone throughout.');
+    insights.push('Overwhelmingly positive communication tone throughout.');
   } else if (data.overallNegativePercent > 30) {
-    insights.push('😔 Notable negative sentiment - may benefit from addressing underlying issues.');
+    insights.push('Notable negative sentiment - may benefit from addressing underlying issues.');
   }
 
   // Communication frequency insights
   if (data.avgMessagesPerDay > 50) {
-    insights.push('📱 Very active daily communication - strong engagement.');
+    insights.push('Very active daily communication - strong engagement.');
   } else if (data.avgMessagesPerDay < 5) {
-    insights.push('📬 Lower message frequency - periodic check-ins or focused conversations.');
+    insights.push('Lower message frequency - periodic check-ins or focused conversations.');
   }
 
   // Emotional insights
   if (data.topEmotions.includes('affection') && context !== 'love') {
-    insights.push('❤️ Affection and care extend beyond typical relationship boundaries.');
+    insights.push('Warmth and appreciation extend beyond typical workplace exchanges.');
   }
 
   if (data.topEmotions.includes('gratitude')) {
-    insights.push('🙏 Appreciation is regularly expressed - a healthy communication pattern.');
+    insights.push('Appreciation is regularly expressed - a healthy communication pattern.');
   }
 
   if (data.topEmotions.includes('trust')) {
-    insights.push('🤝 Trust and reliability are foundational to your conversations.');
+    insights.push('Trust and reliability are foundational to your conversations.');
   }
 
   if (data.topEmotions.includes('anxiety') || data.topEmotions.includes('apology')) {
     if (!insights.some(i => i.includes('anxiety') || i.includes('stress'))) {
-      insights.push('😰 Recurring worry or apology patterns - consider addressing root causes.');
+      insights.push('Recurring worry or apology patterns - consider addressing root causes.');
     }
   }
 
   // Communication pattern insights
   if (data.dominantCommunicationPattern === 'supportive') {
     insights.push(isZambian
-      ? '💪 Predominantly supportive communication - you lift each other up consistently.'
-      : '💪 Predominantly supportive communication style - very encouraging.');
+      ? 'Predominantly supportive communication - you lift each other up consistently.'
+      : 'Predominantly supportive communication style - strong team encouragement.');
   } else if (data.dominantCommunicationPattern === 'passiveAggressive') {
     insights.push(isZambian
-      ? '⚠️ Some indirect communication patterns - speaking directly may help clear the air.'
-      : '⚠️ Some passive-aggressive patterns detected - direct communication may be beneficial.');
+      ? 'Some indirect communication patterns - speaking directly may help clear the air.'
+      : 'Some passive-aggressive patterns detected - direct communication may be beneficial.');
   } else if (data.dominantCommunicationPattern === 'defensive') {
-    insights.push('🛡️ Defensive communication present - vulnerability and openness may improve connection.');
+    insights.push('Defensive communication present - clarity and psychological safety may improve collaboration.');
   } else if (data.dominantCommunicationPattern === 'assertive') {
     insights.push(isZambian
-      ? '💬 Healthy direct communication - you both speak your mind clearly.'
-      : '💬 Healthy assertive communication - clear and direct expression of needs.');
+      ? 'Healthy direct communication - you both speak your mind clearly.'
+      : 'Healthy assertive communication - clear and direct expression of needs.');
   }
 
   // Balance insights
@@ -1222,38 +1233,38 @@ const generateInsights = (data) => {
     const balance = Math.abs(50 - dynamics.communicationBalance);
     if (balance > 30) {
       insights.push(isZambian
-        ? '📊 One person is more active in chatting - both voices matter equally though.'
-        : '📊 Significant imbalance in message contribution - one person initiates more often.');
+        ? 'One person is more active in chatting - both voices matter equally though.'
+        : 'Significant imbalance in message contribution - one person initiates more often.');
     } else if (balance < 10) {
       insights.push(isZambian
-        ? '⚖️ Excellent balance - you both contribute equally to conversations.'
-        : '⚖️ Excellent balance - both participants contribute equally.');
+        ? 'Excellent balance - you both contribute equally to conversations.'
+        : 'Excellent balance - both participants contribute equally.');
     }
   }
 
   // Relationship health insights
   if (dynamics.trustLevel && dynamics.supportLevel) {
     if (dynamics.trustLevel > 70 && dynamics.supportLevel > 70) {
-      insights.push('🌟 Strong foundation of trust and mutual support.');
+      insights.push('Strong foundation of trust and mutual support.');
     }
   }
 
   if (dynamics.conflictLevel) {
     if (dynamics.conflictLevel < 10) {
       insights.push(isZambian
-        ? '☮️ Very low conflict - peaceful communication style (kulibe drama).'
-        : '☮️ Very low conflict - harmonious communication.');
+        ? 'Very low conflict - peaceful communication style (kulibe drama).'
+        : 'Very low conflict - harmonious communication.');
     } else if (dynamics.conflictLevel > 30) {
       insights.push(isZambian
-        ? '⚡ Some tension showing - talking things through may help bring peace.'
-        : '⚡ Elevated conflict levels - may benefit from conflict resolution strategies.');
+        ? 'Some tension showing - talking things through may help bring peace.'
+        : 'Elevated conflict levels - may benefit from conflict resolution strategies.');
     }
   }
 
   // Cultural communication insight
   if (isZambian && insights.length < 7) {
     if (data.avgMessagesPerDay > 10) {
-      insights.push('🌍 Regular WhatsApp communication - staying connected despite busy schedules.');
+      insights.push('Regular WhatsApp communication - staying connected despite busy schedules.');
     }
   }
 
@@ -1621,16 +1632,16 @@ export const generateAICoachNote = async (cardContext, cardType) => {
         promptContext = `Conversation streaks, peak activity times, and communication patterns analyzed.`;
         break;
       case 'milestones':
-        promptContext = `Relationship milestones and special moments in conversation history.`;
+        promptContext = `Team milestones and key moments in conversation history.`;
         break;
       case 'words':
         promptContext = `Top words used: ${cardContext.topWords ? cardContext.topWords.join(', ') : 'various'}.`;
         break;
       default:
-        promptContext = 'General relationship insights.';
+        promptContext = 'General collaboration insights.';
     }
 
-    const prompt = `You are a warm, encouraging relationship coach. Generate a brief, personalized coach's note (1-2 sentences max) for this situation:
+    const prompt = `You are a supportive workplace communication coach. Generate a brief, personalized coach's note (1-2 sentences max) for this situation:
 
 ${promptContext}
 
@@ -1653,15 +1664,15 @@ Return ONLY the coach's note text, no JSON, no quotes, no formatting.`;
 
     // Fallback to generic notes based on card type
     const fallbacks = {
-      balance: "Communication balance shows how you both contribute to the conversation. Every dynamic is unique!",
-      emotions: "Your emotional landscape reflects the authentic connection you share together.",
-      stats: "Regular communication shows investment in the relationship. You're doing great!",
-      patterns: "Your patterns show a natural rhythm. The best conversations flow organically.",
-      milestones: "Every milestone is a testament to the time and care you invest in each other.",
-      words: "The words you use most reveal what matters to you both."
+      balance: "Communication balance shows how participants contribute. Every team dynamic is unique!",
+      emotions: "Emotional patterns reflect the tone of your collaboration.",
+      stats: "Regular communication shows investment in the work. You're doing great!",
+      patterns: "Your patterns show a natural rhythm. Strong teams find a steady cadence.",
+      milestones: "Every milestone reflects the time and care invested in the collaboration.",
+      words: "The words you use most reveal what the team values."
     };
 
-    return fallbacks[cardType] || "Strong relationships thrive on consistent, meaningful communication.";
+    return fallbacks[cardType] || "Strong collaborations thrive on consistent, meaningful communication.";
   }
 };
 
@@ -1673,7 +1684,7 @@ Return ONLY the coach's note text, no JSON, no quotes, no formatting.`;
  */
 export const generateAllCoachNotes = async (allCardContexts) => {
   try {
-    const prompt = `You are a warm, encouraging relationship coach. Generate brief, personalized coach's notes (1-2 sentences max) for each of these relationship insights:
+    const prompt = `You are a supportive workplace communication coach. Generate brief, personalized coach's notes (1-2 sentences max) for each of these collaboration insights:
 
 1. BALANCE (Message Distribution): ${JSON.stringify(allCardContexts.balance)}
 2. EMOTIONS (Sentiment): Positive ${allCardContexts.emotions.positivePercent}%, Negative ${allCardContexts.emotions.negativePercent}%, Top emotions: ${allCardContexts.emotions.topEmotions?.join(', ')}
@@ -1707,12 +1718,12 @@ Return ONLY valid JSON with this exact structure:
 
     // Return fallback notes
     return {
-      balance: "Communication balance shows how you both contribute. Every dynamic is unique!",
-      emotions: "Your emotional landscape reflects the authentic connection you share.",
-      stats: "Regular communication shows investment in the relationship. You're doing great!",
-      patterns: "Your patterns show a natural rhythm. The best conversations flow organically.",
-      milestones: "Every milestone is a testament to the time and care you invest.",
-      words: "The words you use most reveal what matters to you both."
+      balance: "Communication balance shows how participants contribute. Every team dynamic is unique!",
+      emotions: "Emotional patterns reflect the tone of your collaboration.",
+      stats: "Regular communication shows investment in the work. You're doing great!",
+      patterns: "Your patterns show a natural rhythm. Strong teams find a steady cadence.",
+      milestones: "Every milestone reflects the time and care invested.",
+      words: "The words you use most reveal what the team values."
     };
   }
 };

@@ -1,10 +1,19 @@
 /**
  * Storage Service
- * LocalStorage management with Firebase-ready structure
+ * LocalStorage management (Firebase sync disabled)
  * Handles user profiles, chat data, duo sessions, and challenges
  */
 
 import { v4 as uuidv4 } from 'uuid';
+
+// Firebase sync disabled - all data stored in localStorage only
+// import {
+//   createOrGetRelationship,
+//   createConversation,
+//   findConversationByDateRange,
+//   appendMessages,
+//   loadFromFirestore as loadRelationshipFromFirestore
+// } from './relationshipService';
 
 // Storage keys prefix
 const STORAGE_PREFIX = 'isse_';
@@ -177,6 +186,8 @@ export const saveGamificationData = (chatId, data) => {
       version: STORAGE_VERSION,
       chatId,
       participants: data.participants || [],
+      userGender: data.userGender || null,
+      partnerGender: data.partnerGender || null,
       lastAnalyzed: data.lastAnalyzed || new Date().toISOString(),
       gamification: data.gamification || {},
       metadata: data.metadata || {}
@@ -500,3 +511,19 @@ export const exportToFirebase = () => {
     challenges: loadChallengeProgress()
   };
 };
+
+// Firebase sync disabled - All data stored in localStorage only
+// The following functions are commented out to prevent Firebase initialization errors
+
+/**
+ * Sync chat data to Firestore (DISABLED)
+ *
+ * Firebase sync has been disabled. All data is now stored exclusively in localStorage.
+ * To re-enable:
+ * 1. Uncomment the relationshipService imports at the top of this file
+ * 2. Uncomment the syncToFirestore function below
+ * 3. Add valid Firebase configuration to src/services/firebase.js
+ */
+
+// export async function syncToFirestore(userId, chatData) { ... }
+// export const loadFromFirestore = loadRelationshipFromFirestore;

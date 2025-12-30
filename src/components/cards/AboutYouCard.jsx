@@ -3,31 +3,66 @@ import {
   VStack,
   Heading,
   Text,
-  SimpleGrid,
-  Card as ChakraCard,
-  CardBody,
-  Badge,
-  HStack,
-  Divider,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import {
-  FiUser,
-  FiMessageSquare,
-  FiSmile,
-  FiClock,
-  FiHelpCircle,
-  FiTrendingUp,
-} from 'react-icons/fi';
 
 const MotionBox = motion(Box);
+
+// Analyze user's communication traits and return descriptive words
+const analyzeUserTraits = (personalizedInsights, personalizedSentiment) => {
+  const traits = [];
+
+  // Energy level based on message frequency
+  const energyWord = {
+    word: personalizedInsights.initiationRate > 60 ? 'Enthusiastic' :
+          personalizedInsights.initiationRate > 40 ? 'Engaged' :
+          personalizedInsights.initiationRate > 20 ? 'Responsive' : 'Reserved',
+    bgGradient: personalizedInsights.initiationRate > 60 ? 'linear(to-r, orange.400, yellow.500)' :
+                personalizedInsights.initiationRate > 40 ? 'linear(to-r, orange.300, pink.400)' :
+                personalizedInsights.initiationRate > 20 ? 'linear(to-r, blue.400, teal.400)' : 'linear(to-r, purple.400, indigo.400)',
+  };
+  traits.push(energyWord);
+
+  // Emotional expression based on sentiment
+  const emotionWord = {
+    word: personalizedSentiment.positivePercent > 70 ? 'Radiant' :
+          personalizedSentiment.positivePercent > 50 ? 'Optimistic' :
+          personalizedSentiment.positivePercent > 30 ? 'Balanced' : 'Reflective',
+    bgGradient: personalizedSentiment.positivePercent > 70 ? 'linear(to-r, yellow.400, orange.500)' :
+                personalizedSentiment.positivePercent > 50 ? 'linear(to-r, green.400, teal.400)' :
+                personalizedSentiment.positivePercent > 30 ? 'linear(to-r, blue.400, purple.400)' : 'linear(to-r, purple.500, pink.500)',
+  };
+  traits.push(emotionWord);
+
+  // Communication depth based on question rate
+  const depthWord = {
+    word: personalizedInsights.questionRate > 25 ? 'Curious' :
+          personalizedInsights.questionRate > 15 ? 'Inquisitive' :
+          personalizedInsights.questionRate > 5 ? 'Conversational' : 'Declarative',
+    bgGradient: personalizedInsights.questionRate > 25 ? 'linear(to-r, purple.400, pink.500)' :
+                personalizedInsights.questionRate > 15 ? 'linear(to-r, indigo.400, purple.400)' :
+                personalizedInsights.questionRate > 5 ? 'linear(to-r, cyan.400, blue.400)' : 'linear(to-r, blue.500, indigo.500)',
+  };
+  traits.push(depthWord);
+
+  // Expression style based on message length
+  const expressionWord = {
+    word: personalizedInsights.avgMessageLength > 150 ? 'Expressive' :
+          personalizedInsights.avgMessageLength > 80 ? 'Detailed' :
+          personalizedInsights.avgMessageLength > 40 ? 'Concise' : 'Brief',
+    bgGradient: personalizedInsights.avgMessageLength > 150 ? 'linear(to-r, pink.400, rose.500)' :
+                personalizedInsights.avgMessageLength > 80 ? 'linear(to-r, teal.400, green.400)' :
+                personalizedInsights.avgMessageLength > 40 ? 'linear(to-r, blue.400, cyan.400)' : 'linear(to-r, gray.500, blue.400)',
+  };
+  traits.push(expressionWord);
+
+  return traits;
+};
 
 const AboutYouCard = ({ chatData = {} }) => {
   const {
     personalizedInsights,
     personalizedSentiment,
-    communicationStyle,
-    selectedParticipant,
   } = chatData;
 
   if (!personalizedInsights || !personalizedSentiment) {
@@ -48,219 +83,78 @@ const AboutYouCard = ({ chatData = {} }) => {
     );
   }
 
-  const { otherPerson } = personalizedInsights;
-
-  // Format active hours
-  const activeHoursText = personalizedInsights.topHours && personalizedInsights.topHours.length > 0
-    ? personalizedInsights.topHours.map(h => `${h.hour}:00`).join(', ')
-    : 'Various times';
+  const traits = analyzeUserTraits(personalizedInsights, personalizedSentiment);
 
   return (
     <Box
       bg="white"
       borderRadius="3xl"
-      p={8}
+      p={{ base: 6, md: 8 }}
       height="100%"
       display="flex"
       flexDirection="column"
+      justifyContent="center"
       boxShadow="2xl"
-      overflow="hidden"
     >
-      <VStack spacing={6} align="stretch" h="100%" overflowY="auto" overflowX="hidden" pr={2}>
+      <VStack spacing={{ base: 8, md: 10 }} align="center" justify="center" flex={1}>
         {/* Header */}
-        <Box textAlign="center">
+        <MotionBox
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          textAlign="center"
+        >
           <Heading
-            size="xl"
-            bgGradient="linear(to-r, warm.500, peach.500)"
-            bgClip="text"
+            fontSize={{ base: "20px", md: "24px", lg: "28px" }}
+            color="dark.900"
             fontWeight="800"
             mb={2}
           >
-            About You
+            Your Communication Story
           </Heading>
-          <Text fontSize="md" color="sand.600">
-            Your personal communication insights
+          <Text fontSize={{ base: "xs", sm: "sm" }} color="dark.500">
+            How you show up in conversation
           </Text>
-        </Box>
+        </MotionBox>
 
-        <Divider />
-
-        {/* Communication Style Badge */}
-        <Box textAlign="center">
-          <Text fontSize="sm" color="sand.500" mb={2}>Your Communication Style</Text>
-          <Badge
-            fontSize="lg"
-            px={4}
-            py={2}
-            borderRadius="full"
-            colorScheme="warm"
-            textTransform="none"
-          >
-            {communicationStyle}
-          </Badge>
-        </Box>
-
-        {/* Quick Stats Grid */}
-        <SimpleGrid columns={2} spacing={3}>
-          <MotionBox
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ChakraCard
-              bg="warm.50"
-              borderRadius="xl"
-              border="2px solid"
-              borderColor="warm.200"
+        {/* Trait Words Display */}
+        <VStack spacing={{ base: 6, md: 8 }} w="100%" maxW="500px">
+          {traits.map((trait, idx) => (
+            <MotionBox
+              key={idx}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 + idx * 0.15, type: 'spring' }}
+              w="100%"
             >
-              <CardBody p={4}>
-                <VStack spacing={2}>
-                  <Box as={FiMessageSquare} size={24} color="warm.500" />
-                  <Text fontSize="2xl" fontWeight="bold" color="sand.800">
-                    {personalizedInsights.totalMessages.toLocaleString()}
-                  </Text>
-                  <Text fontSize="xs" color="sand.600" textAlign="center">
-                    Messages Sent
-                  </Text>
-                </VStack>
-              </CardBody>
-            </ChakraCard>
-          </MotionBox>
-
-          <MotionBox
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ChakraCard
-              bg="peach.50"
-              borderRadius="xl"
-              border="2px solid"
-              borderColor="peach.200"
-            >
-              <CardBody p={4}>
-                <VStack spacing={2}>
-                  <Box as={FiSmile} size={24} color="peach.500" />
-                  <Text fontSize="2xl" fontWeight="bold" color="sand.800">
-                    {personalizedSentiment.positivePercent}%
-                  </Text>
-                  <Text fontSize="xs" color="sand.600" textAlign="center">
-                    Positive Vibe
-                  </Text>
-                </VStack>
-              </CardBody>
-            </ChakraCard>
-          </MotionBox>
-
-          <MotionBox
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ChakraCard
-              bg="rose.50"
-              borderRadius="xl"
-              border="2px solid"
-              borderColor="rose.200"
-            >
-              <CardBody p={4}>
-                <VStack spacing={2}>
-                  <Box as={FiHelpCircle} size={24} color="rose.500" />
-                  <Text fontSize="2xl" fontWeight="bold" color="sand.800">
-                    {personalizedInsights.questionRate}%
-                  </Text>
-                  <Text fontSize="xs" color="sand.600" textAlign="center">
-                    Ask Questions
-                  </Text>
-                </VStack>
-              </CardBody>
-            </ChakraCard>
-          </MotionBox>
-
-          <MotionBox
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ChakraCard
-              bg="orange.50"
-              borderRadius="xl"
-              border="2px solid"
-              borderColor="orange.200"
-            >
-              <CardBody p={4}>
-                <VStack spacing={2}>
-                  <Box as={FiTrendingUp} size={24} color="orange.500" />
-                  <Text fontSize="2xl" fontWeight="bold" color="sand.800">
-                    {personalizedInsights.initiationRate.toFixed(0)}%
-                  </Text>
-                  <Text fontSize="xs" color="sand.600" textAlign="center">
-                    Start Chats
-                  </Text>
-                </VStack>
-              </CardBody>
-            </ChakraCard>
-          </MotionBox>
-        </SimpleGrid>
-
-        {/* Additional Insights */}
-        <VStack spacing={3} align="stretch" flex={1}>
-          <ChakraCard bg="white" borderRadius="lg" boxShadow="sm">
-            <CardBody p={4}>
-              <HStack spacing={3}>
-                <Box as={FiClock} size={20} color="warm.500" />
-                <VStack align="start" spacing={0} flex={1}>
-                  <Text fontSize="xs" color="sand.500" fontWeight="semibold">
-                    Most Active
-                  </Text>
-                  <Text fontSize="sm" color="sand.700" fontWeight="bold">
-                    {activeHoursText}
-                  </Text>
-                </VStack>
-              </HStack>
-            </CardBody>
-          </ChakraCard>
-
-          <ChakraCard bg="white" borderRadius="lg" boxShadow="sm">
-            <CardBody p={4}>
-              <HStack spacing={3}>
-                <Box as={FiMessageSquare} size={20} color="warm.500" />
-                <VStack align="start" spacing={0} flex={1}>
-                  <Text fontSize="xs" color="sand.500" fontWeight="semibold">
-                    Message Length
-                  </Text>
-                  <Text fontSize="sm" color="sand.700" fontWeight="bold">
-                    {personalizedInsights.avgMessageLength} characters ({personalizedInsights.lengthComparison})
-                  </Text>
-                </VStack>
-              </HStack>
-            </CardBody>
-          </ChakraCard>
-
-          <ChakraCard bg="white" borderRadius="lg" boxShadow="sm">
-            <CardBody p={4}>
-              <HStack spacing={3}>
-                <Box as={FiSmile} size={20} color="warm.500" />
-                <VStack align="start" spacing={0} flex={1}>
-                  <Text fontSize="xs" color="sand.500" fontWeight="semibold">
-                    Emoji Usage
-                  </Text>
-                  <Text fontSize="sm" color="sand.700" fontWeight="bold">
-                    {personalizedInsights.emojiFrequency} per message ({personalizedInsights.emojiComparison} than {otherPerson})
-                  </Text>
-                </VStack>
-              </HStack>
-            </CardBody>
-          </ChakraCard>
+              <VStack spacing={1}>
+                <Heading
+                  fontSize={{ base: "36px", sm: "44px", md: "52px", lg: "56px" }}
+                  fontWeight="black"
+                  bgGradient={trait.bgGradient}
+                  bgClip="text"
+                  letterSpacing="tight"
+                  lineHeight="1"
+                  textAlign="center"
+                >
+                  {trait.word}
+                </Heading>
+              </VStack>
+            </MotionBox>
+          ))}
         </VStack>
 
-        {/* Bottom Insight */}
-        <Box
-          bg="linear-gradient(135deg, #FF8556 0%, #F97316 100%)"
-          p={4}
-          borderRadius="lg"
+        {/* Bottom text */}
+        <MotionBox
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
           textAlign="center"
         >
-          <Text fontSize="sm" color="white" fontWeight="medium">
-            You've been active for {personalizedInsights.daysActive} days in this conversation!
+          <Text fontSize={{ base: "xs", sm: "sm" }} color="dark.500" maxW="280px">
+            These words capture your unique communication essence
           </Text>
-        </Box>
+        </MotionBox>
       </VStack>
     </Box>
   );

@@ -3,16 +3,11 @@ import { Box, HStack, IconButton } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import IntroCard from './cards/IntroCard';
-import StatsCard from './cards/StatsCard';
 import AboutYouCard from './cards/AboutYouCard';
 import CoachingInsightsCard from './cards/CoachingInsightsCard';
 import AIInsightsCard from './cards/AIInsightsCard';
 import BalanceCard from './cards/BalanceCard';
 import EmotionsCard from './cards/EmotionsCard';
-import WordsCard from './cards/WordsCard';
-import PatternsCard from './cards/PatternsCard';
-import HealthCard from './cards/HealthCard';
-import MilestonesCard from './cards/MilestonesCard';
 import ShareCard from './cards/ShareCard';
 
 const MotionBox = motion(Box);
@@ -29,7 +24,6 @@ const SwipeableCardDashboard = ({ chatData }) => {
   const cards = useMemo(() => {
     const allCards = [
       { id: 'intro', component: IntroCard, alwaysShow: true },
-      { id: 'stats', component: StatsCard, alwaysShow: true },
       {
         id: 'aboutyou',
         component: AboutYouCard,
@@ -47,14 +41,6 @@ const SwipeableCardDashboard = ({ chatData }) => {
       },
       { id: 'balance', component: BalanceCard, alwaysShow: true },
       { id: 'emotions', component: EmotionsCard, alwaysShow: true },
-      { id: 'words', component: WordsCard, alwaysShow: true },
-      { id: 'patterns', component: PatternsCard, alwaysShow: true },
-      { id: 'health', component: HealthCard, alwaysShow: true },
-      {
-        id: 'milestones',
-        component: MilestonesCard,
-        shouldShow: () => safeChatData.gamification?.milestones && safeChatData.gamification.milestones.length > 0
-      },
       { id: 'share', component: ShareCard, alwaysShow: true },
     ];
 
@@ -116,7 +102,7 @@ const SwipeableCardDashboard = ({ chatData }) => {
   return (
     <Box
       minH="100vh"
-      bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+      bg="dark.900"
       position="relative"
       overflow="hidden"
       display="flex"

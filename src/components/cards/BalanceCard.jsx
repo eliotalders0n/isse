@@ -1,8 +1,24 @@
-import { Box, VStack, Heading, Text, HStack, Progress } from '@chakra-ui/react';
+import { Box, VStack, Heading, Text, HStack } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import ParticipantAvatar from '../ParticipantAvatar';
 
 const MotionBox = motion(Box);
+
+// Get gradient for balance level
+const getBalanceGradient = (percentage) => {
+  const percent = parseFloat(percentage);
+  if (percent >= 45 && percent <= 55) {
+    return 'linear(to-r, green.400, teal.500)'; // Perfectly balanced
+  } else if (percent >= 35 && percent < 45) {
+    return 'linear(to-r, blue.400, cyan.500)'; // Slightly less
+  } else if (percent > 55 && percent <= 65) {
+    return 'linear(to-r, orange.400, yellow.500)'; // Slightly more
+  } else if (percent < 35) {
+    return 'linear(to-r, purple.400, indigo.500)'; // Much less
+  } else {
+    return 'linear(to-r, pink.400, rose.500)'; // Much more
+  }
+};
 
 const BalanceCard = ({ chatData = {} }) => {
   const {
@@ -13,12 +29,14 @@ const BalanceCard = ({ chatData = {} }) => {
     personalizedInsights
   } = chatData;
 
-  const messageDistribution = Object.entries(stats.senderStats || {}).map(([sender, data]) => ({
-    sender,
-    messages: data.messageCount,
-    percentage: ((data.messageCount / metadata.totalMessages) * 100).toFixed(1),
-    isYou: sender === selectedParticipant,
-  }));
+  const messageDistribution = Object.entries(stats.senderStats || {})
+    .map(([sender, data]) => ({
+      sender,
+      messages: data.messageCount,
+      percentage: ((data.messageCount / metadata.totalMessages) * 100).toFixed(1),
+      isYou: sender === selectedParticipant,
+    }))
+    .sort((a, b) => b.percentage - a.percentage); // Sort by percentage descending
 
   const getBalanceInsight = () => {
     // Use AI-enhanced coach note if available
@@ -78,124 +96,99 @@ const BalanceCard = ({ chatData = {} }) => {
     }
   };
 
-  const participantCount = messageDistribution.length;
-  const isLargeGroup = participantCount > 5;
-
   return (
     <Box
       bg="white"
       borderRadius="3xl"
-      p={8}
+      p={{ base: 6, md: 8 }}
       height="100%"
       display="flex"
       flexDirection="column"
+      justifyContent="center"
       boxShadow="2xl"
-      overflow="hidden"
     >
-      <VStack spacing={4} align="stretch" flex={1} height="100%">
+      <VStack spacing={{ base: 6, md: 8 }} align="center" justify="center" flex={1}>
+        {/* Header */}
         <MotionBox
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          textAlign="center"
         >
-          <Heading size="xl" textAlign="center" color="gray.800" mb={1}>
+          <Heading
+            fontSize={{ base: "20px", md: "24px", lg: "28px" }}
+            color="dark.900"
+            fontWeight="800"
+            mb={2}
+          >
             Who Says What
           </Heading>
-          <Text textAlign="center" color="gray.600" fontSize="lg">
-            Message distribution
+          <Text fontSize={{ base: "xs", sm: "sm" }} color="dark.500">
+            Message distribution across the conversation
           </Text>
         </MotionBox>
 
-        <VStack
-          spacing={isLargeGroup ? 4 : 5}
-          align="stretch"
-          flex={1}
-          overflowY="auto"
-          maxH={isLargeGroup ? "500px" : "none"}
-          pr={2}
-          css={{
-            '&::-webkit-scrollbar': {
-              width: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: '#f1f1f1',
-              borderRadius: '10px',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: '#888',
-              borderRadius: '10px',
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              background: '#555',
-            },
-          }}
-        >
-          {messageDistribution.map((person, idx) => {
-            // Determine mood based on their contribution balance
-            const senderData = stats.senderStats[person.sender];
-            const isBalanced = parseFloat(person.percentage) > 35 && parseFloat(person.percentage) < 65;
-            const mood = isBalanced ? 'happy' : parseFloat(person.percentage) > 50 ? 'happy' : 'neutral';
-
-            return (
+        {/* Message Distribution */}
+        <VStack spacing={{ base: 5, md: 6 }} w="100%" maxW="500px">
+          {messageDistribution.map((person, idx) => (
             <MotionBox
               key={person.sender}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 + Math.min(idx * 0.1, 0.5) }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 + idx * 0.1, type: 'spring' }}
+              w="100%"
             >
-              <HStack mb={2} justify="space-between">
-                <HStack spacing={3} flex={1} minW={0}>
-                  <ParticipantAvatar name={person.sender} size="sm" showName={false} mood={mood} />
-                  <VStack align="start" spacing={0} flex={1} minW={0}>
-                    <HStack spacing={2}>
-                      <Text
-                        fontWeight="bold"
-                        fontSize={isLargeGroup ? "md" : "lg"}
-                        color="gray.800"
-                        noOfLines={1}
-                      >
-                        {person.isYou ? 'You' : person.sender}
-                      </Text>
-                      {person.isYou && (
-                        <Text fontSize="xs" color="purple.500" fontWeight="semibold">
-                          ({person.sender})
-                        </Text>
-                      )}
-                    </HStack>
-                    <Text fontSize="sm" color="gray.500">
-                      {person.messages.toLocaleString()} messages
-                    </Text>
-                  </VStack>
+              <VStack spacing={2} w="100%">
+                <HStack spacing={3} w="100%" justify="center">
+                  <ParticipantAvatar
+                    name={person.sender}
+                    size="sm"
+                    showName={false}
+                  />
+                  <Text
+                    fontSize={{ base: "md", md: "lg" }}
+                    fontWeight="bold"
+                    color="dark.800"
+                  >
+                    {person.isYou ? 'You' : person.sender}
+                  </Text>
                 </HStack>
-                <Text fontSize={isLargeGroup ? "xl" : "2xl"} fontWeight="black" color="purple.600" flexShrink={0}>
+
+                <Heading
+                  fontSize={{ base: "44px", sm: "52px", md: "60px", lg: "68px" }}
+                  fontWeight="black"
+                  bgGradient={getBalanceGradient(person.percentage)}
+                  bgClip="text"
+                  letterSpacing="tighter"
+                  lineHeight="1"
+                  textAlign="center"
+                >
                   {person.percentage}%
+                </Heading>
+
+                <Text
+                  fontSize={{ base: "xs", sm: "sm" }}
+                  color="dark.600"
+                  textAlign="center"
+                  fontWeight="600"
+                >
+                  {person.messages.toLocaleString()} messages
                 </Text>
-              </HStack>
-              <Progress
-                value={person.percentage}
-                colorScheme="purple"
-                size={isLargeGroup ? "md" : "lg"}
-                borderRadius="full"
-                bg="purple.100"
-              />
+              </VStack>
             </MotionBox>
-          );
-          })}
+          ))}
         </VStack>
 
+        {/* Bottom coaching insight */}
         <MotionBox
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          bg="blue.50"
-          p={4}
-          borderRadius="xl"
-          borderLeft="4px solid"
-          borderColor="blue.500"
-          flexShrink={0}
+          transition={{ delay: 1.0 }}
+          textAlign="center"
+          maxW="400px"
         >
-          <Text color="gray.700" fontSize={isLargeGroup ? "sm" : "md"} lineHeight="tall">
-            <strong>Coach's note:</strong> {getBalanceInsight()}
+          <Text fontSize={{ base: "xs", sm: "sm" }} color="dark.500" lineHeight="tall">
+            {getBalanceInsight()}
           </Text>
         </MotionBox>
       </VStack>

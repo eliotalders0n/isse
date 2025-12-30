@@ -27,12 +27,19 @@ export const calculateWordFrequency = (messages, topN = 20) => {
     'were', 'said', 'did', 'having', 'may', 'should', 'am', 'very', 'much',
   ]);
 
+  // WhatsApp system message words to filter out
+  const systemWords = new Set([
+    'omitted', 'deleted', 'message', 'video', 'image', 'audio', 'sticker',
+    'document', 'gif', 'contact', 'location', 'missed', 'call', 'voice',
+    'attachment', 'file', 'media', 'pdf', 'doc', 'vcf', 'poll',
+  ]);
+
   messages.forEach((message) => {
     const words = message.text
       .toLowerCase()
       .replace(/[^\w\s]/g, ' ')
       .split(/\s+/)
-      .filter(word => word.length > 2 && !stopWords.has(word));
+      .filter(word => word.length > 2 && !stopWords.has(word) && !systemWords.has(word));
 
     words.forEach(word => {
       wordCount[word] = (wordCount[word] || 0) + 1;

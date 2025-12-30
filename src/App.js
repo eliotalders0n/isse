@@ -1,46 +1,15 @@
 import { useState, useEffect } from 'react';
 import Clarity from '@microsoft/clarity';
-import { Box, Container, Heading, Text, VStack, Card, CardBody, useToast, Spinner, Progress } from '@chakra-ui/react';
+import { Box, Grid, Heading, Text, VStack, Card, useToast } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 // liquid-glass removed: revert to Chakra-only visuals
 import FileUpload from './components/FileUpload';
 import ChatParticipationPrompt from './components/ChatParticipationPrompt';
 import ParticipantSelector from './components/ParticipantSelector';
 import SwipeableCardDashboard from './components/SwipeableCardDashboard';
-import bgImage from './assets/3746043.jpg';
-import { parseWhatsAppChat, parseJSONChat, parseGmailPDF, getStatsPerSender, getMessagesPerDay } from './utils/whatsappParser';
+import Walkthrough from './components/Walkthrough';
+import { useAnalysisOrchestrator } from './hooks/useAnalysisOrchestrator';
 import {
-  calculateWordFrequency,
-  calculateWordFrequencyPerSender,
-  findConversationStreaks,
-  findSilencePeriods,
-  calculateResponseTimes,
-  detectPeakHours,
-  calculateEngagementScore,
-} from './utils/analytics';
-import {
-  analyzeChatSentiment,
-  getSentimentTimeline,
-  generateRelationshipSummary,
-  calculateEmotionSynchrony,
-  detectConflictResolution,
-  getAffectionLevel,
-  detectToxicity,
-  generateAllCoachNotes,
-} from './services/sentimentAnalysis';
-import {
-  calculateRelationshipLevel,
-  calculateCompatibilityScore,
-  generateBadges,
-  detectMilestones,
-  calculateWeeklyHealthScores,
-  calculateStreakData,
-} from './utils/gamification';
-import {
-  generateChatId,
-  saveGamificationData,
-  loadGamificationData,
-  updateUserProfileStats,
   initializeUserProfile,
   cleanupExpiredDuoSessions,
 } from './services/storageService';
@@ -50,18 +19,34 @@ import {
   getCommunicationStyle,
   getPersonalizedCoachingInsights,
 } from './utils/personalizedAnalytics';
+import {
+  getParticipantToast,
+  getProcessingMessage
+} from './constants/toastMessagesConstants';
 
 function App() {
-  const [chatData, setChatData] = useState(null);
   const [selectedParticipant, setSelectedParticipant] = useState(null);
+  const [userGender, setUserGender] = useState(null);
+  const [partnerGender, setPartnerGender] = useState(null);
   const [processedData, setProcessedData] = useState(null);
-  const [parsedData, setParsedData] = useState(null); // Store parsed but not analyzed data
-  const [isParticipant, setIsParticipant] = useState(null); // null = not asked, true/false = response
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [processingStep, setProcessingStep] = useState('');
-  const [processingProgress, setProcessingProgress] = useState(0);
+  const [finalChatData, setFinalChatData] = useState(null);
+  const [walkthroughCompleted, setWalkthroughCompleted] = useState(
+    () => localStorage.getItem('isse_walkthrough_completed') === 'true'
+  );
   const projectId = "ue8u3agkqw"
   const toast = useToast();
+
+  // Use the semantic analysis orchestrator (no user auth yet, pass null)
+  const {
+    chatData,
+    parsedData,
+    isParticipant,
+    isProcessing,
+    processingStep,
+    processingProgress,
+    handleFileProcessed,
+    runFullAnalysis,
+  } = useAnalysisOrchestrator(null); // null = no user authentication yet
 
   Clarity.init(projectId);
 
@@ -71,344 +56,29 @@ function App() {
     cleanupExpiredDuoSessions();
   }, []);
 
-  // Step 1: Quick file parsing only (no heavy analysis)
-  const handleFileProcessed = async (fileContent, fileType = 'text') => {
-    setIsProcessing(true);
-
-    try {
-      toast({
-        title: '📁 Reading chat file',
-        description: 'Parsing messages...',
-        status: 'info',
-        duration: 2000,
-        isClosable: true,
-        position: 'top',
-      });
-
-      // Use appropriate parser based on file type
-      let parsed;
-      if (fileType === 'json') {
-        parsed = parseJSONChat(fileContent);
-      } else if (fileType === 'pdf') {
-        parsed = parseGmailPDF(fileContent);
-      } else {
-        parsed = parseWhatsAppChat(fileContent);
-      }
-
-      const { messages, metadata } = parsed;
-
-      if (messages.length === 0) {
-        throw new Error('No messages found in the file');
-      }
-
-      // Store parsed data and show participation prompt
-      setParsedData({ messages, metadata, fileType });
-      setIsProcessing(false);
-
-      toast({
-        title: '✅ Chat loaded!',
-        description: `Found ${messages.length.toLocaleString()} messages from ${metadata.participants.length} participants`,
-        status: 'success',
-        duration: 2000,
-        isClosable: true,
-        position: 'top',
-      });
-    } catch (error) {
-      console.error('Error parsing chat:', error);
-      setIsProcessing(false);
-
-      toast({
-        title: '❌ Error reading file',
-        description: error.message || 'Failed to parse your chat. Please check the file format.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-        position: 'top',
-      });
+  // When chatData is ready and user is a participant, store it for participant selection
+  useEffect(() => {
+    if (chatData && isParticipant && !selectedParticipant) {
+      setProcessedData(chatData);
     }
+  }, [chatData, isParticipant, selectedParticipant]);
+
+  const handleWalkthroughComplete = () => {
+    localStorage.setItem('isse_walkthrough_completed', 'true');
+    setWalkthroughCompleted(true);
   };
 
-  // Step 2: Full analysis (called after user responds to participation prompt)
-  const runFullAnalysis = async (userIsParticipant) => {
-    if (!parsedData) return;
+  const handleParticipantSelected = (selectionData) => {
+    // Handle both old format (string) and new format (object) for backwards compatibility
+    const participant = typeof selectionData === 'string'
+      ? selectionData
+      : selectionData.participant;
+    const uGender = selectionData.userGender || null;
+    const pGender = selectionData.partnerGender || null;
 
-    setIsProcessing(true);
-    setProcessingProgress(0);
-    setIsParticipant(userIsParticipant);
-
-    const { messages, metadata } = parsedData;
-
-    try {
-      setProcessingProgress(10);
-
-      // Step 2: Calculating analytics
-      setProcessingStep('Analyzing conversation patterns...');
-      setProcessingProgress(30);
-      toast({
-        title: '📊 Calculating analytics',
-        description: `Found ${messages.length.toLocaleString()} messages from ${metadata.participants.length} participants`,
-        status: 'info',
-        duration: 2000,
-        isClosable: true,
-        position: 'top',
-      });
-
-      const senderStats = getStatsPerSender(messages);
-      const messagesPerDay = getMessagesPerDay(messages);
-      const wordFrequency = calculateWordFrequency(messages, 30);
-      const wordFrequencyPerSender = calculateWordFrequencyPerSender(messages, 15);
-      const streaks = findConversationStreaks(messages);
-      const silences = findSilencePeriods(messages, 3);
-      const responseTimes = calculateResponseTimes(messages);
-      const peakHours = detectPeakHours(messages);
-      const engagementScore = calculateEngagementScore(messages, 'week');
-
-      const totalDays = Math.ceil(
-        (messages[messages.length - 1].timestamp - messages[0].timestamp) / (1000 * 60 * 60 * 24)
-      );
-      const avgMessagesPerDay = Math.round(messages.length / totalDays);
-
-      const stats = {
-        senderStats,
-        messagesPerDay,
-        responseTimes,
-        totalDays,
-        avgMessagesPerDay,
-      };
-
-      const analytics = {
-        wordFrequency,
-        wordFrequencyPerSender,
-        streaks,
-        silences,
-        peakHours,
-        engagementScore,
-        totalDays,
-        avgMessagesPerDay,
-      };
-
-      setProcessingProgress(45);
-
-      // Step 3: Sentiment analysis (keyword-based)
-      setProcessingStep('Running sentiment analysis...');
-      setProcessingProgress(50);
-      toast({
-        title: '😊 Analyzing emotions',
-        description: 'Detecting sentiment and emotional patterns...',
-        status: 'info',
-        duration: 2000,
-        isClosable: true,
-        position: 'top',
-      });
-
-      console.log('📊 Step 1: Running keyword-based sentiment analysis (fast, no AI quota)...');
-      // First pass: Fast keyword-based sentiment analysis for all messages
-      // This analyzes ALL messages using keyword matching (no API calls, instant results)
-      const messagesWithSentiment = analyzeChatSentiment(messages, false);
-      const sentimentTimeline = getSentimentTimeline(messagesWithSentiment, 'day');
-
-      setProcessingProgress(60);
-
-      // Step 4: AI enhancement
-      setProcessingStep('Enhancing with AI insights...');
-      setProcessingProgress(65);
-      toast({
-        title: '🤖 AI enhancement',
-        description: 'Getting deeper conversation insights...',
-        status: 'info',
-        duration: 2000,
-        isClosable: true,
-        position: 'top',
-      });
-
-      console.log('🤖 Step 2: Enhancing with AI conversation-level insights (1 API call)...');
-      // Second pass: AI-powered conversation insights (uses only 1 API call instead of 30+)
-      // Old approach: 30+ API calls to analyze individual messages = high quota usage
-      // New approach: 1 API call for conversation-level insights = 97% quota reduction
-      const sentiment = await generateRelationshipSummary(messagesWithSentiment, stats, true);
-      sentiment.timeline = sentimentTimeline;
-
-      // Calculate additional sentiment metrics
-      sentiment.emotionSynchrony = calculateEmotionSynchrony(messagesWithSentiment, metadata.participants);
-      sentiment.conflictResolution = detectConflictResolution(messagesWithSentiment);
-      sentiment.affectionLevel = getAffectionLevel(messagesWithSentiment);
-      sentiment.toxicity = detectToxicity(messagesWithSentiment);
-
-      setProcessingProgress(75);
-
-      // Step 5: Generating coach's notes
-      setProcessingStep('Generating personalized coaching...');
-      setProcessingProgress(78);
-      toast({
-        title: '💬 Creating coach\'s notes',
-        description: 'Personalizing insights for you...',
-        status: 'info',
-        duration: 2000,
-        isClosable: true,
-        position: 'top',
-      });
-
-      console.log('💬 Step 3: Generating AI-enhanced coach\'s notes for all cards (1 API call)...');
-      // Third pass: AI-powered coach's notes for all cards (1 API call for all cards)
-      const coachNotes = await generateAllCoachNotes({
-        balance: {
-          participants: metadata.participants,
-          messageDistribution: stats.senderStats
-        },
-        emotions: {
-          positivePercent: sentiment.positivePercent,
-          negativePercent: sentiment.negativePercent,
-          neutralPercent: sentiment.neutralPercent,
-          topEmotions: sentiment.topEmotions
-        },
-        stats: {
-          totalMessages: metadata.totalMessages,
-          totalDays: analytics.totalDays,
-          avgMessagesPerDay: analytics.avgMessagesPerDay,
-          overallSentiment: sentiment.overallSentiment
-        },
-        patterns: {
-          peakHours: analytics.peakHours?.slice(0, 3).map(h => typeof h === 'object' ? h.hour : h),
-          longestStreak: analytics.streaks?.[0]?.days || 0
-        }
-      });
-      sentiment.coachNotes = coachNotes;
-
-      setProcessingProgress(85);
-
-      // Step 6: Calculating achievements
-      setProcessingStep('Calculating achievements and milestones...');
-      setProcessingProgress(88);
-      toast({
-        title: '🎯 Calculating achievements',
-        description: 'Finding milestones and unlocking badges...',
-        status: 'info',
-        duration: 2000,
-        isClosable: true,
-        position: 'top',
-      });
-
-      // Generate chat ID from participants
-      const chatId = generateChatId(metadata.participants);
-
-      // Load existing gamification data (for historical tracking)
-      const existingGamification = loadGamificationData(chatId);
-
-      // Calculate gamification metrics
-      const gamification = {
-        relationshipLevel: calculateRelationshipLevel(messagesWithSentiment, sentiment, { ...analytics, senderStats }),
-        compatibilityScore: calculateCompatibilityScore(messagesWithSentiment, sentiment, analytics, stats),
-        badges: generateBadges(messagesWithSentiment, sentiment, analytics, stats),
-        milestones: detectMilestones(messagesWithSentiment, analytics, stats),
-        healthScores: calculateWeeklyHealthScores(messagesWithSentiment, sentiment, analytics),
-        streakData: calculateStreakData(messagesWithSentiment),
-        wrappedData: existingGamification?.wrappedData || null,
-        unlockedInsights: existingGamification?.unlockedInsights || [],
-        challengeProgress: existingGamification?.challengeProgress || {},
-      };
-
-      // Save to localStorage
-      saveGamificationData(chatId, {
-        chatId,
-        participants: metadata.participants,
-        gamification,
-        lastAnalyzed: new Date().toISOString(),
-        metadata: {
-          totalMessages: metadata.totalMessages,
-          startDate: metadata.startDate,
-          endDate: metadata.endDate
-        }
-      });
-
-      // Update user profile stats
-      updateUserProfileStats(gamification.badges);
-
-      setProcessingProgress(95);
-
-      // Step 7: Finalizing
-      setProcessingStep('Almost done...');
-      setProcessingProgress(98);
-
-      // Check if this is a group chat (3+ participants)
-      const isGroupChat = metadata.participants.length >= 3;
-
-      setProcessingProgress(100);
-
-      if (!userIsParticipant) {
-        // User is NOT a participant - show group/general insights only
-        console.log('User is not a participant, showing general insights');
-
-        toast({
-          title: '✨ Analysis complete!',
-          description: isGroupChat
-            ? `Group chat analyzed with ${metadata.participants.length} members`
-            : 'Chat analyzed successfully',
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-          position: 'top',
-        });
-
-        setIsProcessing(false);
-
-        setChatData({
-          messages: messagesWithSentiment,
-          metadata,
-          stats,
-          analytics,
-          sentiment,
-          gamification,
-          chatId,
-          selectedParticipant: null,
-          personalizedInsights: null,
-          personalizedSentiment: null,
-          communicationStyle: null,
-          coachingInsights: null,
-          isGroupChat,
-        });
-      } else {
-        // User IS a participant - need to identify them
-        console.log('User is a participant, showing participant selector');
-
-        toast({
-          title: '✨ Analysis complete!',
-          description: 'Please select which participant you are',
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-          position: 'top',
-        });
-
-        setIsProcessing(false);
-
-        setProcessedData({
-          messages: messagesWithSentiment,
-          metadata,
-          stats,
-          analytics,
-          sentiment,
-          gamification,
-          chatId,
-          isGroupChat,
-        });
-      }
-    } catch (error) {
-      console.error('Error processing chat:', error);
-      setIsProcessing(false);
-
-      toast({
-        title: '❌ Error processing chat',
-        description: error.message || 'Failed to analyze your chat. Please try again.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-        position: 'top',
-      });
-    }
-  };
-
-  const handleParticipantSelected = (participant) => {
     setSelectedParticipant(participant);
+    setUserGender(uGender);
+    setPartnerGender(pGender);
 
     // Calculate personalized insights
     const personalizedInsights = getPersonalizedInsights(processedData.messages, participant);
@@ -416,19 +86,23 @@ function App() {
     const communicationStyle = getCommunicationStyle(personalizedInsights, personalizedSentiment);
     const coachingInsights = getPersonalizedCoachingInsights(personalizedInsights, personalizedSentiment);
 
+    // Gender-aware toast message
+    const toastConfig = getParticipantToast(uGender);
     toast({
-      title: '🎉 Welcome!',
-      description: `Showing personalized insights for ${participant}`,
+      title: toastConfig.title,
+      description: toastConfig.description,
       status: 'success',
       duration: 2000,
       isClosable: true,
       position: 'top',
     });
 
-    // Set final chat data with personalized insights
-    setChatData({
+    // Set final chat data with personalized insights and gender preferences
+    setFinalChatData({
       ...processedData,
       selectedParticipant: participant,
+      userGender: uGender,
+      partnerGender: pGender,
       personalizedInsights,
       personalizedSentiment,
       communicationStyle,
@@ -443,11 +117,198 @@ function App() {
   return (
     <Box
       minH="100vh"
+      w="100%"
       overflowX="hidden"
-      bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
       position="relative"
+      bg="linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)"
     >
-      {/* Loading Overlay */}
+      {/* Animated Vector Background */}
+      <Box
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        overflow="hidden"
+        zIndex={0}
+        pointerEvents="none"
+      >
+        {/* Gradient Orbs - Optimized for Mobile */}
+        <motion.div
+          animate={{
+            x: [0, 50, 0],
+            y: [0, 30, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          style={{
+            position: 'absolute',
+            top: '5%',
+            left: '5%',
+            width: '300px',
+            height: '300px',
+            background: 'radial-gradient(circle, rgba(255,133,86,0.2) 0%, rgba(255,133,86,0) 70%)',
+            borderRadius: '50%',
+            filter: 'blur(40px)',
+          }}
+        />
+        <motion.div
+          animate={{
+            x: [0, -30, 0],
+            y: [0, 50, 0],
+            scale: [1, 1.15, 1],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          style={{
+            position: 'absolute',
+            top: '40%',
+            right: '5%',
+            width: '350px',
+            height: '350px',
+            background: 'radial-gradient(circle, rgba(249,115,22,0.15) 0%, rgba(249,115,22,0) 70%)',
+            borderRadius: '50%',
+            filter: 'blur(50px)',
+          }}
+        />
+        <motion.div
+          animate={{
+            x: [0, 40, 0],
+            y: [0, -40, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          style={{
+            position: 'absolute',
+            bottom: '5%',
+            left: '20%',
+            width: '280px',
+            height: '280px',
+            background: 'radial-gradient(circle, rgba(244,63,94,0.12) 0%, rgba(244,63,94,0) 70%)',
+            borderRadius: '50%',
+            filter: 'blur(45px)',
+          }}
+        />
+
+        {/* Geometric Vector Shapes - Hidden on Mobile for Performance */}
+        <Box
+          as="svg"
+          width="100%"
+          height="100%"
+          position="absolute"
+          top={0}
+          left={0}
+          opacity={{ base: 0.04, md: 0.06, lg: 0.08 }}
+          display={{ base: 'none', md: 'block' }}
+        >
+          {/* Animated Circles */}
+          <motion.circle
+            cx="15%"
+            cy="20%"
+            r="120"
+            fill="none"
+            stroke="rgba(255,133,86,0.6)"
+            strokeWidth="2"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.circle
+            cx="85%"
+            cy="70%"
+            r="150"
+            fill="none"
+            stroke="rgba(249,115,22,0.5)"
+            strokeWidth="2"
+            animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.4, 0.2] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
+
+          {/* Animated Polygons */}
+          <motion.polygon
+            points="80,20 120,80 40,80"
+            fill="none"
+            stroke="rgba(244,63,94,0.4)"
+            strokeWidth="2"
+            transform="translate(70%, 15%)"
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.polygon
+            points="0,50 25,0 75,0 100,50 75,100 25,100"
+            fill="none"
+            stroke="rgba(255,133,86,0.3)"
+            strokeWidth="2"
+            transform="translate(10%, 60%) scale(1.5)"
+            animate={{ rotate: [0, -360] }}
+            transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+          />
+
+          {/* Decorative Lines */}
+          <motion.line
+            x1="0%"
+            y1="30%"
+            x2="40%"
+            y2="30%"
+            stroke="rgba(255,133,86,0.2)"
+            strokeWidth="1"
+            strokeDasharray="5,5"
+            animate={{ x2: ["40%", "50%", "40%"] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.line
+            x1="60%"
+            y1="80%"
+            x2="100%"
+            y2="80%"
+            stroke="rgba(249,115,22,0.2)"
+            strokeWidth="1"
+            strokeDasharray="5,5"
+            animate={{ x1: ["60%", "50%", "60%"] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </Box>
+
+        {/* Floating Dots - Reduced on Mobile */}
+        <Box display={{ base: 'none', sm: 'block' }}>
+          {[...Array(8)].map((_, i) => (
+            <motion.div
+              key={i}
+              animate={{
+                y: [0, -30, 0],
+                opacity: [0.2, 0.5, 0.2],
+              }}
+              transition={{
+                duration: 5 + i * 0.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: i * 0.2,
+              }}
+              style={{
+                position: 'absolute',
+                left: `${10 + i * 10}%`,
+                top: `${20 + (i % 3) * 20}%`,
+                width: '3px',
+                height: '3px',
+                borderRadius: '50%',
+                background: i % 3 === 0 ? 'rgba(255,133,86,0.6)' : i % 3 === 1 ? 'rgba(249,115,22,0.5)' : 'rgba(244,63,94,0.4)',
+              }}
+            />
+          ))}
+        </Box>
+      </Box>
+
+      {/* Loading Overlay with Modern Design */}
       <AnimatePresence>
         {isProcessing && (
           <motion.div
@@ -460,42 +321,73 @@ function App() {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: 'rgba(102, 126, 234, 0.95)',
-              backdropFilter: 'blur(10px)',
+              background: 'linear-gradient(135deg, rgba(15,12,41,0.98) 0%, rgba(48,43,99,0.98) 100%)',
+              backdropFilter: 'blur(20px)',
               zIndex: 9999,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              padding: '16px',
             }}
           >
-            <VStack spacing={6} p={8}>
-              <Box textAlign="center">
-                <Spinner
-                  size="xl"
-                  color="white"
-                  thickness="4px"
-                  speed="0.8s"
-                  emptyColor="whiteAlpha.300"
+            <VStack spacing={{ base: 6, md: 8 }} maxW="500px" w="100%">
+              <Box position="relative" w="80px" h="80px">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  style={{
+                    width: '80px',
+                    height: '80px',
+                    border: '3px solid rgba(255,133,86,0.3)',
+                    borderTop: '3px solid rgba(255,133,86,1)',
+                    borderRadius: '50%',
+                  }}
                 />
               </Box>
-              <VStack spacing={3} maxW="400px">
-                <Heading size="lg" color="white" textAlign="center">
+              <VStack spacing={{ base: 3, md: 4 }} w="100%" px={{ base: 4, md: 0 }}>
+                <Heading
+                  fontSize={{ base: "18px", sm: "20px", md: "24px" }}
+                  bgGradient="linear(to-r, warm.500, peach.500, rose.500)"
+                  bgClip="text"
+                  textAlign="center"
+                >
                   {processingStep}
                 </Heading>
-                <Text color="whiteAlpha.900" fontSize="md" textAlign="center">
-                  Analyzing your conversation...
+                <Text
+                  color="whiteAlpha.900"
+                  fontSize={{ base: "14px", md: "16px" }}
+                  textAlign="center"
+                >
+                  {getProcessingMessage(userGender)}
                 </Text>
-                <Box w="100%" pt={2}>
-                  <Progress
-                    value={processingProgress}
-                    size="sm"
-                    colorScheme="whiteAlpha"
-                    bg="whiteAlpha.300"
+                <Box w="100%" pt={{ base: 2, md: 3 }}>
+                  <Box
+                    position="relative"
+                    w="100%"
+                    h={{ base: "6px", md: "8px" }}
+                    bg="whiteAlpha.200"
                     borderRadius="full"
-                    hasStripe
-                    isAnimated
-                  />
-                  <Text color="whiteAlpha.800" fontSize="sm" textAlign="center" mt={2}>
+                    overflow="hidden"
+                  >
+                    <motion.div
+                      animate={{
+                        width: `${processingProgress}%`,
+                      }}
+                      transition={{ duration: 0.3 }}
+                      style={{
+                        height: '100%',
+                        background: 'linear-gradient(90deg, #FF8556, #F97316, #F43F5E)',
+                        borderRadius: '9999px',
+                      }}
+                    />
+                  </Box>
+                  <Text
+                    color="warm.400"
+                    fontSize={{ base: "12px", md: "14px" }}
+                    textAlign="center"
+                    mt={{ base: 2, md: 3 }}
+                    fontWeight="600"
+                  >
                     {processingProgress}%
                   </Text>
                 </Box>
@@ -505,71 +397,162 @@ function App() {
         )}
       </AnimatePresence>
 
+      {/* Main Content */}
       <Box position="relative" zIndex={1}>
         <AnimatePresence mode="wait">
-          {!parsedData && !processedData && !chatData ? (
+          {!walkthroughCompleted ? (
             <MotionBox
-              key="upload"
+              key="walkthrough"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <Container maxW="container.md" py={{ base: 8, md: 20 }} px={{ base: 4, md: 6 }}>
-                <VStack spacing={{ base: 8, md: 10 }} align="stretch">
-                  <Box w="100%" display="flex" justifyContent="center">
-                    <Card bg="white" borderRadius="2xl" boxShadow="xl" w="100%">
-                      <CardBody px={{ base: 6, md: 10 }} py={8} maxW="720px" mx="auto" textAlign="center">
-                        <MotionHeading
-                          size={{ base: "2xl", md: "3xl" }}
-                          mb={4}
-                          color="sand.800"
-                          fontWeight="800"
-                          initial={{ y: -20, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: 0.2 }}
+              <Walkthrough onComplete={handleWalkthroughComplete} />
+            </MotionBox>
+          ) : !parsedData && !chatData && !finalChatData ? (
+            <MotionBox
+              key="upload"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <Box
+                minH="100vh"
+                display="flex"
+                alignItems="center"
+                py={{ base: 6, md: 12, lg: 16 }}
+                px={{ base: 4, sm: 6, md: 8, lg: 12 }}
+              >
+                <Box
+                  maxW="1600px"
+                  mx="auto"
+                  w="100%"
+                >
+                  <Grid
+                    templateColumns={{ base: '1fr', lg: '1fr 1fr' }}
+                    gap={{ base: 6, sm: 8, md: 12, lg: 16 }}
+                    alignItems={{ base: 'stretch', lg: 'center' }}
+                  >
+                    {/* LEFT COLUMN: Intro with Modern Typography */}
+                    <VStack
+                      align={{ base: 'center', lg: 'flex-start' }}
+                      spacing={{ base: 5, md: 6, lg: 8 }}
+                      textAlign={{ base: 'center', lg: 'left' }}
+                      order={{ base: 1, lg: 1 }}
+                    >
+                      <MotionHeading
+                        fontSize={{ base: "48px", sm: "56px", md: "64px", lg: "72px" }}
+                        bgGradient="linear(to-r, warm.400, peach.500, rose.500)"
+                        bgClip="text"
+                        fontWeight="900"
+                        letterSpacing="tight"
+                        initial={{ y: -30, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2, duration: 0.6 }}
+                      >
+                        TETA
+                      </MotionHeading>
+                      <MotionHeading
+                        fontSize={{ base: "18px", sm: "20px", md: "24px", lg: "28px" }}
+                        color="whiteAlpha.900"
+                        fontWeight="600"
+                        initial={{ y: -20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.3, duration: 0.6 }}
+                      >
+                        Your Relationship Bestie
+                      </MotionHeading>
+                      <MotionText
+                        fontSize={{ base: "14px", sm: "15px", md: "16px", lg: "18px" }}
+                        color="whiteAlpha.800"
+                        lineHeight="1.7"
+                        maxW={{ base: "100%", sm: "400px", lg: "90%" }}
+                        initial={{ y: -10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.4, duration: 0.6 }}
+                      >
+                        Ever wonder what your conversations really say about your connection?
+                        Find out now!
+                      </MotionText>
+
+                      {/* Feature Pills */}
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.6, duration: 0.6 }}
+                        style={{ width: '100%' }}
+                      >
+                        <Box
+                          display="flex"
+                          flexWrap="wrap"
+                          gap={{ base: 2, md: 3 }}
+                          justifyContent={{ base: 'center', lg: 'flex-start' }}
                         >
-                          Isse
-                        </MotionHeading>
-                        <MotionText
-                          fontSize={{ base: "xl", md: "2xl" }}
-                          color="sand.700"
-                          mb={3}
-                          fontWeight="600"
-                          initial={{ y: -10, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: 0.3 }}
+                          {['Understand Your Vibes', 'See Communication Patterns', 'Strengthen Your Bond'].map((feature, i) => (
+                            <Box
+                              key={i}
+                              px={{ base: 3, sm: 4, md: 5 }}
+                              py={{ base: 1.5, md: 2.5 }}
+                              borderRadius="full"
+                              bg="whiteAlpha.100"
+                              backdropFilter="blur(10px)"
+                              border="1px solid"
+                              borderColor="whiteAlpha.200"
+                              fontSize={{ base: "11px", sm: "12px", md: "13px" }}
+                              color="whiteAlpha.900"
+                              fontWeight="600"
+                              whiteSpace="nowrap"
+                            >
+                              {feature}
+                            </Box>
+                          ))}
+                        </Box>
+                      </motion.div>
+                    </VStack>
+
+                    {/* RIGHT COLUMN: Upload Card with Glassmorphism */}
+                    <Box
+                      w="100%"
+                      order={{ base: 2, lg: 2 }}
+                    >
+                      <motion.div
+                        initial={{ opacity: 0, x: 0, y: 20 }}
+                        animate={{ opacity: 1, x: 0, y: 0 }}
+                        transition={{ delay: 0.4, duration: 0.6 }}
+                      >
+                        <Card
+                          bg="whiteAlpha.100"
+                          backdropFilter="blur(20px)"
+                          borderRadius={{ base: "2xl", md: "3xl" }}
+                          p={{ base: 6, sm: 7, md: 9, lg: 12 }}
+                          border="1px solid"
+                          borderColor="whiteAlpha.200"
+                          boxShadow="0 8px 32px 0 rgba(0, 0, 0, 0.37)"
+                          _hover={{
+                            boxShadow: "0 12px 40px 0 rgba(255, 133, 86, 0.2)",
+                            borderColor: "whiteAlpha.300",
+                          }}
+                          transition="all 0.3s ease"
+                          w="100%"
+                          maxW={{ base: "100%", lg: "700px" }}
+                          mx={{ base: "auto", lg: 0 }}
                         >
-                          Your Relationship Coach
-                        </MotionText>
-                        <MotionText
-                          fontSize={{ base: "md", md: "lg" }}
-                          color="sand.600"
-                          initial={{ y: -10, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: 0.4 }}
-                        >
-                          Upload your WhatsApp chat and discover the beautiful patterns in your connection
-                        </MotionText>
-                      </CardBody>
-                    </Card>
-                  </Box>
-                  <Box w="100%" display="flex" justifyContent="center">
-                    <Card bg="white" borderRadius="2xl" boxShadow="lg" w="100%">
-                      <CardBody maxW="720px" mx="auto" w="100%" px={{ base: 4, md: 6 }} py={{ base: 6, md: 8 }}>
-                        <FileUpload onFileProcessed={handleFileProcessed} />
-                      </CardBody>
-                    </Card>
-                  </Box>
-                </VStack>
-              </Container>
+                          <FileUpload onFileProcessed={handleFileProcessed} />
+                        </Card>
+                      </motion.div>
+                    </Box>
+                  </Grid>
+                </Box>
+              </Box>
             </MotionBox>
           ) : parsedData && isParticipant === null ? (
             <MotionBox
               key="participation"
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.5 }}
             >
               <ChatParticipationPrompt
@@ -577,12 +560,12 @@ function App() {
                 onResponse={runFullAnalysis}
               />
             </MotionBox>
-          ) : processedData && !selectedParticipant ? (
+          ) : processedData && isParticipant && !selectedParticipant ? (
             <MotionBox
               key="selector"
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.5 }}
             >
               <ParticipantSelector
@@ -598,7 +581,7 @@ function App() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <SwipeableCardDashboard chatData={chatData} />
+              <SwipeableCardDashboard chatData={finalChatData || chatData} />
             </MotionBox>
           )}
         </AnimatePresence>

@@ -23,14 +23,14 @@ const ChatParticipationPrompt = ({ participants, onResponse }) => {
                 <Box
                   as={isGroupChat ? FiUsers : FiUser}
                   size={64}
-                  color="purple.500"
+                  color="accent.600"
                   mx="auto"
                   mb={4}
                 />
-                <Heading size="xl" color="gray.800" mb={3}>
+                <Heading size="xl" color="dark.800" mb={3}>
                   {isGroupChat ? 'Group Chat Detected' : 'Chat Loaded'}
                 </Heading>
-                <Text fontSize="lg" color="gray.600">
+                <Text fontSize="lg" color="dark.600">
                   {isGroupChat
                     ? `Found ${participants.length} participants in this conversation`
                     : `Found a conversation between ${participants.join(' and ')}`}
@@ -39,7 +39,7 @@ const ChatParticipationPrompt = ({ participants, onResponse }) => {
 
               {/* Participant List */}
               <Box
-                bg="gray.50"
+                bg="dark.50"
                 p={4}
                 borderRadius="lg"
                 maxH="150px"
@@ -52,9 +52,9 @@ const ChatParticipationPrompt = ({ participants, onResponse }) => {
                         w="8px"
                         h="8px"
                         borderRadius="full"
-                        bg="purple.400"
+                        bg="accent.600"
                       />
-                      <Text fontSize="md" color="gray.700" fontWeight="medium">
+                      <Text fontSize="md" color="dark.700" fontWeight="medium">
                         {participant}
                       </Text>
                     </HStack>
@@ -64,10 +64,10 @@ const ChatParticipationPrompt = ({ participants, onResponse }) => {
 
               {/* Question */}
               <Box textAlign="center" py={2}>
-                <Text fontSize="xl" fontWeight="bold" color="purple.600" mb={2}>
+                <Text fontSize="xl" fontWeight="bold" color="accent.600" mb={2}>
                   Are you part of this conversation?
                 </Text>
-                <Text fontSize="md" color="gray.600">
+                <Text fontSize="md" color="dark.600">
                   We'll personalize insights if you're a participant
                 </Text>
               </Box>
@@ -104,7 +104,7 @@ const ChatParticipationPrompt = ({ participants, onResponse }) => {
               </VStack>
 
               {/* Helper Text */}
-              <Text fontSize="sm" color="gray.500" textAlign="center" pt={2}>
+              <Text fontSize="sm" color="dark.500" textAlign="center" pt={2}>
                 {isGroupChat
                   ? "Selecting 'Yes' will let you see your personal stats within the group"
                   : "Selecting 'Yes' will give you personalized coaching insights"}
